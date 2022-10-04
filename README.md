@@ -23,10 +23,24 @@ It does following:
 
 ## Build the project
 
+### Step 1 - Launch VS code and build container
+
  1. Launch VS Code
  2. Run the "Remote-Containers: Open Folder in Container..." command from the Command Palette (F1)
  3. Open folder where this project was cloned. It will start building the container.
  4. When step 3 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
+
+### Step 2 - Build computational_geometry_template application
+
+```
+./build_all.sh
+```
+
+### Step 3 - Run computational_geometry_template application
+
+```
+./install/bin/computational_geometry_template ./examples/bottle_ascii.stl
+```
  
 
 
