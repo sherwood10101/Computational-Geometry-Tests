@@ -13,3 +13,21 @@ It does following:
  3. Displays the mesh using polyscope.
  4. To demonstrate integration of Geometric Tools, finds out intersection between line and plane and reports it to stdout to terminal.
  5. Performs scaling of the mesh, and then output a resulting mesh file (user is able to choose STL, or PLY in ascii or binary).
+
+# Pre-requisites
+
+ 1. Install VS Code, docker and VS Code remote development extension, instructions are [here](https://code.visualstudio.com/docs/remote/containers#_installation)
+ 2. [Install Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+# Build and Run
+
+## Build the project
+
+ 1. Launch VS Code
+ 2. Run the "Remote-Containers: Open Folder in Container..." command from the Command Palette (F1)
+ 3. Open folder where this project was cloned. It will start building the container.
+ 4. When step 3 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
+ 
+
+
+ 
