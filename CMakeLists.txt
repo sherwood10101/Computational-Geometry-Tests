@@ -19,15 +19,20 @@ ExternalProject_Add(OpenMesh
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/OpenMesh/install
 )
 
+include_directories(${CMAKE_BINARY_DIR}/external/OpenMesh/src/OpenMesh/src)
+link_directories(${CMAKE_BINARY_DIR}/external/OpenMesh/install/lib)
+SET(CMAKE_EXE_LINKER_FLAGS 
+          "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,${CMAKE_BINARY_DIR}/external/OpenMesh/install/lib")
+
 file(
   GLOB_RECURSE APP_SRC_FILES
-  src/computational_geometry_template_main.cc)
+  src/computational_geometry_template_main.cc
+  src/mesh_loader.cc)
 
 # Add computational_geometry_template exec.
 add_executable(computational_geometry_template ${APP_SRC_FILES})
 # Add dependencies
-target_link_libraries(computational_geometry_template stdc++fs)
-add_dependencies(computational_geometry_template OpenMesh)
+target_link_libraries(computational_geometry_template stdc++fs OpenMeshCore OpenMeshTools)
 
 # Install targets defined above
 install(TARGETS computational_geometry_template DESTINATION bin)
