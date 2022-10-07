@@ -17,6 +17,9 @@ class Mesh {
     /// Utility function to report basic mesh stats.
     void reportStats() const;
 
+    /// CGMesh reference.
+    const CGMesh& getMesh() const { return m_mesh; }
+
   private:
     /// @brief OpenMesh object.
     CGMesh m_mesh;

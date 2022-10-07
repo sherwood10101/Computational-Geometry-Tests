@@ -24,15 +24,30 @@ link_directories(${CMAKE_BINARY_DIR}/external/OpenMesh/install/lib)
 SET(CMAKE_EXE_LINKER_FLAGS 
           "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,${CMAKE_BINARY_DIR}/external/OpenMesh/install/lib")
 
+# Geometric Tools integration
+ExternalProject_Add(GeometricTools
+  GIT_REPOSITORY https://github.com/davideberly/GeometricTools.git
+  GIT_TAG GTE-version-6.4
+  PREFIX ${CMAKE_BINARY_DIR}/external/GeometricTools
+  SOURCE_SUBDIR "GTE"
+  INSTALL_COMMAND cmake -E echo "Skipping install step."
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/GeometricTools/install
+)
+
+include_directories(${CMAKE_BINARY_DIR}/external/GeometricTools/src/GeometricTools/GTE)
+link_directories(${CMAKE_BINARY_DIR}/external/GeometricTools/src/GeometricTools/GTE/lib/Static)
+
 file(
   GLOB_RECURSE APP_SRC_FILES
   src/computational_geometry_template_main.cc
-  src/mesh_loader.cc)
+  src/mesh_loader.cc
+  src/minimum_volume_box_calculator.cc)
 
 # Add computational_geometry_template exec.
 add_executable(computational_geometry_template ${APP_SRC_FILES})
 # Add dependencies
-target_link_libraries(computational_geometry_template stdc++fs OpenMeshCore OpenMeshTools)
+target_link_libraries(computational_geometry_template stdc++fs pthread OpenMeshCore OpenMeshTools gtapplications gtgraphics gtmathematicsgpu)
+add_dependencies(computational_geometry_template OpenMesh GeometricTools)
 
 # Install targets defined above
 install(TARGETS computational_geometry_template DESTINATION bin)

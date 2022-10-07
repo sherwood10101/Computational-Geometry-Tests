@@ -1,4 +1,5 @@
 // Computational geometry template application.
+#include <minimum_volume_box_calculator.h>
 #include <mesh_loader.h>
 
 #include <assert.h>
@@ -20,7 +21,7 @@ int main (const int argc, char **const argv)
 
   std::cout << "Processing input mesh file : " << mesh_file << std::endl;
 
-  // 1. Load mesh.
+  // 1. Load mesh using OpenMesh library.
   computational_geometry::MeshLoader mesh_loader(mesh_file);
 
   // 2. Do mesh statistics report.
@@ -28,7 +29,9 @@ int main (const int argc, char **const argv)
 
   // 3. TODO: Display the mesh using polyscope.
 
-  // 4. TODO: To demonstrate integration of Geometric Tools, compute 3D bounding box of the mesh and reports it's volume.
+  // 4. To demonstrate integration of Geometric Tools, compute minimum volume 3D bounding box of the mesh and reports it's volume.
+  computational_geometry::MinimumVolumeBoxCalculator box_calculator(mesh_loader.getMesh());
+  std::cout << "Minimum 3D bbox volume: " << box_calculator.getVolume() << std::endl;
 
   // 5. Perform 2X scaling of the mesh and then outputs a resulting mesh file.
 
