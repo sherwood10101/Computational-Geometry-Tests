@@ -37,17 +37,38 @@ ExternalProject_Add(GeometricTools
 include_directories(${CMAKE_BINARY_DIR}/external/GeometricTools/src/GeometricTools/GTE)
 link_directories(${CMAKE_BINARY_DIR}/external/GeometricTools/src/GeometricTools/GTE/lib/Static)
 
+# Polyscope integration
+ExternalProject_Add(polyscope
+  GIT_REPOSITORY https://github.com/nmwsharp/polyscope.git
+  GIT_TAG v1.3.0
+  PREFIX ${CMAKE_BINARY_DIR}/external/polyscope
+  INSTALL_COMMAND cmake -E echo "Skipping install step."
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/polyscope/install
+)
+
+include_directories(${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope/include 
+                    ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope/deps/imgui/imgui 
+                    ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope/deps/glm)
+link_directories(${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/src
+                 ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/deps/imgui
+                 ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/deps/stb
+                 ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/deps/glad/src
+                 ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/deps/glfw/src)
+
 file(
   GLOB_RECURSE APP_SRC_FILES
   src/computational_geometry_template_main.cc
   src/mesh_loader.cc
+  src/mesh_visualizer.cc
   src/minimum_volume_box_calculator.cc)
 
 # Add computational_geometry_template exec.
 add_executable(computational_geometry_template ${APP_SRC_FILES})
 # Add dependencies
-target_link_libraries(computational_geometry_template stdc++fs pthread OpenMeshCore OpenMeshTools gtapplications gtgraphics gtmathematicsgpu)
-add_dependencies(computational_geometry_template OpenMesh GeometricTools)
+target_link_libraries(computational_geometry_template stdc++fs pthread OpenMeshCore 
+                      OpenMeshTools gtapplications gtgraphics gtmathematicsgpu 
+                      libpolyscope.a libimgui.a libstb.a libglad.a libglfw3.a dl X11)
+add_dependencies(computational_geometry_template OpenMesh GeometricTools polyscope)
 
 # Install targets defined above
 install(TARGETS computational_geometry_template DESTINATION bin)

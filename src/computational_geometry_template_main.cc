@@ -1,6 +1,9 @@
 // Computational geometry template application.
 #include <minimum_volume_box_calculator.h>
 #include <mesh_loader.h>
+#include <mesh_visualizer.h>
+
+#include "polyscope/polyscope.h"
 
 #include <assert.h>
 
@@ -27,13 +30,18 @@ int main (const int argc, char **const argv)
   // 2. Do mesh statistics report.
   mesh_loader.getMesh().reportStats();
 
-  // 3. TODO: Display the mesh using polyscope.
+  // 3. Display the mesh using polyscope.
+  // Initialize polyscope.
+  polyscope::init();
+  // Visualize mesh
+  computational_geometry::MeshVisualizer mesh_visualizer(mesh_loader.getMesh());
+  mesh_visualizer.showMesh();
 
   // 4. To demonstrate integration of Geometric Tools, compute minimum volume 3D bounding box of the mesh and reports it's volume.
   computational_geometry::MinimumVolumeBoxCalculator box_calculator(mesh_loader.getMesh());
   std::cout << "Minimum 3D bbox volume: " << box_calculator.getVolume() << std::endl;
 
-  // 5. Perform 2X scaling of the mesh and then outputs a resulting mesh file.
+  // 5. TODO: Perform 2X scaling of the mesh and then outputs a resulting mesh file.
 
   std::cout << "Done." << std::endl;
 
