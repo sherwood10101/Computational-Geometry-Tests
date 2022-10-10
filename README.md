@@ -25,10 +25,11 @@ It does following:
 
 ### Step 1 - Launch VS code and build container
 
- 1. Launch VS Code
- 2. Run the "Remote-Containers: Open Folder in Container..." command from the Command Palette (F1)
- 3. Open folder where this project was cloned. It will start building the container.
- 4. When step 3 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
+ 1. To be able to run GUI using OpenGL from docker container, need to install VcXsrv Windows X Server. The process is described [here](https://dev.to/darksmile92/run-gui-app-in-linux-docker-container-on-windows-host-4kde), please follow instructions in "How to share the display from a windows host?" section. The only note - no need to install it through Chocolatey, just run downloaded installer executable, then start Xlaunch and follow instructions in this section (save config to %userprofile% folder as extracted, at least, it worked for me). No need to create dockerfile etc after that, it is all will be done within VS Code later.
+ 2. Launch VS Code
+ 3. Run the "Remote-Containers: Open Folder in Container..." command from the Command Palette (F1)
+ 4. Open folder where this project was cloned. It will start building the container.
+ 5. When step 4 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
 
 ### Step 2 - Build computational_geometry_template application
 
