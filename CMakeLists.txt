@@ -55,19 +55,41 @@ link_directories(${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/src
                  ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/deps/glad/src
                  ${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/deps/glfw/src)
 
+# PoissonRecon integration
+find_package(OpenMP REQUIRED)
+ExternalProject_Add(PoissonRecon
+  GIT_REPOSITORY https://github.com/mkazhdan/PoissonRecon.git
+  GIT_TAG 16375a78928bd67b4cad1a410131f4b5f0afabde
+  PREFIX ${CMAKE_BINARY_DIR}/external/PoissonRecon
+  INSTALL_DIR ${CMAKE_BINARY_DIR}/../install
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND make
+  BUILD_IN_SOURCE TRUE
+  INSTALL_COMMAND cmake -E echo "Skipping install step."
+)
+
+include_directories(${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Src)
+link_directories(${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux)
+
 file(
   GLOB_RECURSE APP_SRC_FILES
   src/computational_geometry_template_main.cc
   src/mesh_loader.cc
   src/mesh_visualizer.cc
-  src/minimum_volume_box_calculator.cc)
+  src/minimum_volume_box_calculator.cc
+  src/poisson_recon.cc)
 
 # Add computational_geometry_template exec.
 add_executable(computational_geometry_template ${APP_SRC_FILES})
 # Add dependencies
 target_link_libraries(computational_geometry_template stdc++fs pthread OpenMeshCore 
                       OpenMeshTools gtapplications gtgraphics gtmathematicsgpu 
-                      libpolyscope.a libimgui.a libstb.a libglad.a libglfw3.a dl X11)
+                      libpolyscope.a libimgui.a libstb.a libglad.a libglfw3.a dl X11 OpenMP::OpenMP_CXX 
+                      ${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux/Geometry.o
+                      ${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux/PlyFile.o
+                      ${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux/CmdLineParser.o
+                      ${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux/Factor.o
+                      ${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux/MarchingCubes.o)
 add_dependencies(computational_geometry_template OpenMesh GeometricTools polyscope)
 
 # Install targets defined above
