@@ -8,10 +8,14 @@ namespace computational_geometry {
 Mesh::Mesh(const std::string& mesh_file) 
 {
   std::cout << "Loading mesh file..." << std::endl;
-
-  if (!OpenMesh::IO::read_mesh(m_mesh, mesh_file))  {
+  OpenMesh::IO::Options options;
+  options += OpenMesh::IO::Options::Flag::FaceNormal;
+  options += OpenMesh::IO::Options::Flag::VertexNormal;
+  if (!OpenMesh::IO::read_mesh(m_mesh, mesh_file, options))  {
     throw std::runtime_error("Cannot load mesh file");
   }
+  m_mesh.request_face_normals();
+  m_mesh.request_vertex_normals();
 }
 
 void Mesh::reportStats() const 

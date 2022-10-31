@@ -19,6 +19,7 @@ class Mesh {
 
     /// CGMesh reference.
     const CGMesh& getMesh() const { return m_mesh; }
+    CGMesh& getMesh() { return m_mesh; }
 
   private:
     /// @brief OpenMesh object.
@@ -33,6 +34,8 @@ class MeshLoader {
 
     /// @return constant reference to the loaded Mesh object.
     const Mesh& getMesh() const {return m_mesh;}
+    /// @return non-constant reference to the loaded Mesh object.
+    Mesh& getMesh() {return m_mesh;}
 
   private:
     /// Mesh object.

@@ -59,6 +59,7 @@ link_directories(${CMAKE_BINARY_DIR}/external/polyscope/src/polyscope-build/src
 find_package(OpenMP REQUIRED)
 ExternalProject_Add(PoissonRecon
   GIT_REPOSITORY https://github.com/mkazhdan/PoissonRecon.git
+  # Version 9.011
   GIT_TAG 16375a78928bd67b4cad1a410131f4b5f0afabde
   PREFIX ${CMAKE_BINARY_DIR}/external/PoissonRecon
   INSTALL_DIR ${CMAKE_BINARY_DIR}/../install

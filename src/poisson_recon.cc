@@ -1,30 +1,4 @@
-/*
-Copyright (c) 2006, Michael Kazhdan and Matthew Bolitho
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of
-conditions and the following disclaimer. Redistributions in binary form must reproduce
-the above copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the distribution. 
-
-Neither the name of the Johns Hopkins University nor the names of its contributors
-may be used to endorse or promote products derived from this software without specific
-prior written permission. 
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
-SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.
-*/
+#include <poisson_recon.h>
 
 #undef FAST_COMPILE
 #undef ARRAY_DEBUG
@@ -63,6 +37,10 @@ void DumpOutput2( std::vector< char* >& comments , const char* format , ... );
 #endif // DEFAULT_FULL_DEPTH
 
 #include <stdarg.h>
+#include <assert.h>
+
+#include <iostream>
+
 char* outputFile=NULL;
 int echoStdout=0;
 void DumpOutput( const char* format , ... )
@@ -736,3 +714,37 @@ int Execute( int argc , char* argv[] )
 	}
 }
 #endif
+
+namespace computational_geometry {
+
+// PoissonMeshReconstructor class implementation
+void PoissonMeshReconstructor::Run() 
+{
+	std::cout << "Running PoissonRecon..." << std::endl;
+	
+	int argc = 5;
+	char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
+	const_cast<char*>(m_output_ply_file.c_str()) };
+
+	double t = Time();
+	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+
+	{
+		if( Density.set )
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorAndValueVertex< float > >( argc , argv );
+				else             Execute< float  , PlyColorAndValueVertex< float > >( argc , argv );
+			else
+				if( Double.set ) Execute< double , PlyValueVertex< float > >( argc , argv );
+				else             Execute< float  , PlyValueVertex< float > >( argc , argv );
+		else
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorVertex< float > >( argc , argv );
+				else             Execute< float  , PlyColorVertex< float > >( argc , argv );
+			else
+				if( Double.set ) Execute< double , PlyVertex< float > >( argc , argv );
+				else             Execute< float  , PlyVertex< float > >( argc , argv );
+	}
+}
+
+} // namespace computational_geometry
