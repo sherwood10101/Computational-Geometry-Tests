@@ -36,6 +36,7 @@ It does following:
 ```
 ./build_all.sh
 ```
+If you get "command not found", you can manually create the build directory and manually run the cmake command from the script
 
 ### Step 3 - Run computational_geometry_template application
 
