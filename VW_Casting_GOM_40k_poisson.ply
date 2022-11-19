@@ -1,0 +1,20 @@
+ply
+format binary_little_endian 1.0
+comment Running Screened Poisson Reconstruction (Version 9.011)
+comment 	--in points.txt
+comment 	--out ./VW_Casting_GOM_40k_poisson.ply
+comment # Read input into tree:       0.5 (s),      48.7 (MB) /      48.7 (MB)
+comment #   Got kernel density:       0.0 (s),      48.7 (MB) /      48.7 (MB)
+comment #     Got normal field:       0.0 (s),      48.7 (MB) /      48.7 (MB)
+comment #       Finalized tree:       0.0 (s),      48.7 (MB) /      48.7 (MB)
+comment #  Set FEM constraints:       0.0 (s),      48.7 (MB) /      48.7 (MB)
+comment #Set point constraints:       0.0 (s),      48.7 (MB) /      48.7 (MB)
+comment # Linear system solved:       0.0 (s),     112.9 (MB) /     112.9 (MB)
+comment #        Got triangles:       0.1 (s),     115.0 (MB) /     115.0 (MB)
+element vertex 0
+property float x
+property float y
+property float z
+element face 0
+property list uchar int vertex_indices
+end_header
