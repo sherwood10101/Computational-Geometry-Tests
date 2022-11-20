@@ -29,7 +29,19 @@ It does following:
  2. Launch VS Code
  3. Run the "Remote-Containers: Open Folder in Container..." command from the Command Palette (F1)
  4. Open folder where this project was cloned. It will start building the container.
- 5. When step 4 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
+ 5. *ALT*: If you don't have the command for step 3, go to the extensions icon on the left side tool bar
+    make sure you have the docker and dev containers extensions installed
+    click on the 'dev containers' extension.
+    In the main window, one of the options is "open folder"
+    this is equivalent to "remote-container: openfolder in container"
+    use this command link if you can't find the command in the F1 menu.
+
+    alternate 2:
+    from F1 menu
+    Remote Explorer: focus on Details (Containers) view
+    then on left bar next to "Containers", click plus sign to create a new container and select the option: "Open folder in container..."
+    navigate to the folder where you cloned the repo 
+ 6. When step 4 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
 
 ### Step 2 - Build computational_geometry_template application
 
