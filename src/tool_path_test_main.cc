@@ -31,17 +31,31 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
   double sigma = std::clamp(step_coord_change_avg / 2., 5., 100.);
   std::normal_distribution<double> step_distribution(static_cast<double>(step_coord_change_avg), sigma);
 
+  std::default_random_engine coord_index_generator;
+  std::uniform_int_distribution<int> coord_index_distribution(0,2);
+
+  std::default_random_engine velocity_generator;
+  std::uniform_real_distribution<double> velocity_distribution(-5.0,10.0);
+
   int n_points = tool_path.numPoints();
+  computational_geometry::Vector3D location_prev;
+  int step = 1;
   for(int i = 0; i < n_points;) {
     if (i == 0) {
       // Set initial trajectory location.
       computational_geometry::Vector3D initial_location{0., 0., 0.};
-      tool_path.setLocation(0, initial_location);
+      location_prev = initial_location;
+      tool_path.setLocation(i, initial_location);
     } else {
-      // TODO: implement this part.
+      int coord_index = coord_index_distribution(coord_index_generator);
+      double velocity = velocity_distribution(velocity_generator);
+      auto current_location = location_prev;
+      current_location[coord_index] += velocity * static_cast<double>(step);
+      tool_path.setLocation(i, current_location);
+      location_prev = current_location;
     }
 
-    int step = std::clamp(static_cast<int>(step_distribution(step_generator)), 1, n_points / 3);
+    step = std::clamp(static_cast<int>(step_distribution(step_generator)), 1, n_points / 3);
     // std::cout << "step = " << step << std::endl;
     i += step;
   }
