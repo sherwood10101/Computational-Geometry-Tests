@@ -2,10 +2,12 @@
 #include <tool_path.h>
 
 #include <unistd.h>
+#include <algorithm>
 #include <chrono>
 #include <ios>
 #include <iostream>
 #include <fstream>
+#include <random>
 #include <string>
 
 // Basic procedure to populate test tool path data according to spec:
@@ -23,7 +25,34 @@
 
 void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_change_avg, int vector_data_size,
                     double nodes_percentage_with_string_data, double nodes_percentage_with_3d_vector) {
-  // TODO: implement this function.
+  // Perform random coordinate changes for approximately  every step_coord_change_avg points.
+
+  std::default_random_engine step_generator;
+  double sigma = std::clamp(step_coord_change_avg / 2., 5., 100.);
+  std::normal_distribution<double> step_distribution(static_cast<double>(step_coord_change_avg), sigma);
+
+  int n_points = tool_path.numPoints();
+  for(int i = 0; i < n_points;) {
+    if (i == 0) {
+      // Set initial trajectory location.
+      computational_geometry::Vector3D initial_location{0., 0., 0.};
+      tool_path.setLocation(0, initial_location);
+    } else {
+      // TODO: implement this part.
+    }
+
+    int step = std::clamp(static_cast<int>(step_distribution(step_generator)), 1, n_points / 3);
+    // std::cout << "step = " << step << std::endl;
+    i += step;
+  }
+
+  // Finalize locations initialization (update location for last chunk of path points).
+  tool_path.finalizeLocations();
+
+  // TODO: Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
+  std::string comment(100, 'x');
+
+  // TODO: Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -108,10 +137,10 @@ int main (const int argc, char **const argv)
   
   // 3. TODO: Track performance for random access of 10% of the data.
 
-  // 4. TODO: track performance for downgrading points to the minimum 
+  // 4. TODO: Track performance for downgrading points to the minimum 
   //    (replace all upgraded nodes with simplest version with no metadata).
 
-  // 5. Track performance to randomly insert 10% new nodes with random metadata as above.
+  // 5. TODO: Track performance to randomly insert 10% new nodes with random metadata as above.
 
   return 0;
 }
