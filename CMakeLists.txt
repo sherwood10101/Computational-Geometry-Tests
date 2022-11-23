@@ -93,5 +93,17 @@ target_link_libraries(computational_geometry_template stdc++fs pthread OpenMeshC
                       ${CMAKE_BINARY_DIR}/external/PoissonRecon/src/PoissonRecon/Bin/Linux/MarchingCubes.o)
 add_dependencies(computational_geometry_template OpenMesh GeometricTools polyscope)
 
+# ToolPath library
+file(
+  GLOB_RECURSE TOOLPATH_SRC_FILES
+  src/tool_path.cc)
+
+add_library(ToolPath ${TOOLPATH_SRC_FILES})
+
+# ToolPath test executable
+add_executable(tool_path_test src/tool_path_test_main.cc)
+target_link_libraries (tool_path_test ToolPath)
+
+
 # Install targets defined above
-install(TARGETS computational_geometry_template DESTINATION bin)
+install(TARGETS computational_geometry_template tool_path_test DESTINATION bin)

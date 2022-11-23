@@ -1,4 +1,4 @@
-# computational_geometry_project_template
+# computational_geometry_template
 
 Template project using Visual Studio Code Remote environment using development container. It can be run on both Windows and Linux. It integrates following libraries:
 
@@ -19,6 +19,20 @@ It does following:
  1. Install VS Code, docker and VS Code remote development extension, instructions are [here](https://code.visualstudio.com/docs/remote/containers#_installation)
  2. [Install Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
+
+# tool_path_test
+
+Project to demo/test ToolPath library.  It does following:
+
+- creates a tool path data structure
+- adds optional upgraded node storage for certain nodes to include x, y, or z or floating point metadata plus An optional string field plus an optional large 3D array (10 x 10 x 10 vector of vectors of vectors of float) that  can be attached occasionally to any point.
+- populates Toolpath instance with 100 million points (nodes), starting with only x,y,z data where each x or y or z coordinate changes randomly approximately every 20 points. Then randomly upgrade 1% of the points to hold a 100 character string.  Then upgrade 0.1% of the points to also hold a 3D array of floats
+- tracks performance (time and storage space) for creation
+- tracks performance for sequential access of all data (full toolpath)
+- tracks performance for random access of 10% of the data
+- tracks performance for downgrading points to the minimum (i.e., replace all upgraded nodes with simplest version with no metadata)
+- tracks performance to randomly insert 10% new nodes with random metadata as above
+
 # Build and Run
 
 ## Build the project
@@ -31,19 +45,23 @@ It does following:
  4. Open folder where this project was cloned. It will start building the container.
  5. When step 4 is completed, bring another terminal in VS Code (Ctrl+Shift+~). Now you are ready to build.
 
-### Step 2 - Build computational_geometry_template application
+### Step 2 - Build computational_geometry_template and tool_path_test applications
 
 ```
 ./build_all.sh
 ```
 If you get "command not found", you can manually create the build directory and manually run the cmake command from the script
 
-### Step 3 - Run computational_geometry_template application
+### Step 3 - Run computational_geometry_template and/or tool_path_test applications
 
 ```
 ./install/bin/computational_geometry_template ./examples/airplane_ascii.ply ./airplane_ascii_poisson_reconstructed.ply
 ```
- 
+
+ ```
+./install/bin/tool_path_test
+```
+
 
 
  
