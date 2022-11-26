@@ -10,9 +10,9 @@ namespace computational_geometry {
 typedef std::array<float, 3> Vector3D;
 
 /// Tool path point data class.
-class ToolPathPointData {
+class ToolPathPointMetaData {
   public:
-    ToolPathPointData() {}
+    ToolPathPointMetaData() {}
     // TODO : define this class.
 };
 
@@ -20,13 +20,19 @@ class ToolPathPointData {
 class ToolPathPoint {
   public:
     ToolPathPoint() {}
+
+    /// @brief set index of point this point has inherited location from.
+    void setLocationIndex(int point_index);
+
+    /// @brief get point index for location inherited from.
+    int getLocationIndex() const { return m_point_location_index; }
   
   private:
-    // Actual 3D point
-    Vector3D* location{nullptr};
+    // Index of point (in ToolPath::m_points) this point has inherited location from (maybe the same point).
+    int m_point_location_index{0};
 
     // Data associated with this path point.
-    std::optional<ToolPathPointData> m_data{std::nullopt};
+    std::optional<ToolPathPointMetaData> m_data{std::nullopt};
 };
 
 /// Top-level class for ToolPath object.

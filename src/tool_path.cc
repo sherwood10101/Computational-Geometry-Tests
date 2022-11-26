@@ -1,16 +1,66 @@
 #include <tool_path.h>
 
+#include <assert.h>
+
 namespace computational_geometry {
+
+void ToolPathPoint::setLocationIndex(int point_index) {
+  assert(point_index >= 0);
+  assert(point_index >= m_point_location_index);
+  m_point_location_index = point_index;
+}
 
 ToolPath::ToolPath(int n_points) : m_points(n_points) {
 }
 
 void ToolPath::setLocation(int point_index, const Vector3D& location) {
-  // TODO: implement this function
+  auto iter_range = m_locations.equal_range(point_index);
+  if (m_locations.empty() || iter_range.second == m_locations.begin()) {
+    // This is initial point of trajectory, it must always be at index = 0
+    assert(point_index == 0);
+  } else {
+    if (iter_range.first == m_locations.end()) {
+      // Get the last existing location.
+      int last_location_index = m_locations.rbegin()->first;
+      assert(last_location_index < point_index);
+
+      // Annotate location indices for [last_location_index, point_index) interval of points
+      for(int i = last_location_index + 1; i < point_index; i++) {
+        m_points[i].setLocationIndex(last_location_index);
+      }
+    } else {
+      auto iter_from = iter_range.first;
+      int location_index_from = iter_from->first;
+      auto iter_to = iter_range.second;
+      int location_index_to = iter_to->first;
+      assert(point_index >= location_index_from);
+      assert(point_index <= location_index_to);
+
+      // Annotate location indices for [point_index, location_index_to) interval of points
+      for(int i = point_index + 1; i < location_index_to; i++) {
+        m_points[i].setLocationIndex(point_index);
+      }
+    }
+  }
+
+  // Insert location into the map.
+  m_locations[point_index] = location;
+
+  // Set location index for the point.
+  m_points[point_index].setLocationIndex(point_index);
 }
 
 void ToolPath::finalizeLocations() {
-  // TODO: implement this function
+  // Get the last existing location.
+  int last_location_index = m_locations.rbegin()->first;
+  int n_points = m_points.size();
+  assert(last_location_index < n_points);
+  assert(m_points[last_location_index].getLocationIndex() == last_location_index);
+
+  // Annotate location indices for [last_location_index, point_index interval of points)
+  for(int i = last_location_index + 1; i < n_points; i++) {
+    m_points[i].setLocationIndex(last_location_index);
+  }
 }
   
 } // namespace computational_geometry
