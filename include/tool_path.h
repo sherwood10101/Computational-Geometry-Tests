@@ -3,17 +3,28 @@
 #include <array>
 #include <map>
 #include <optional>
+#include <set>
 #include <vector>
 
 namespace computational_geometry {
 
 typedef std::array<float, 3> Vector3D;
+typedef std::vector<std::vector<std::vector<float>>> Data3D;
 
-/// Tool path point data class.
+/// Tool path point metadata class.
 class ToolPathPointMetaData {
   public:
     ToolPathPointMetaData() {}
-    // TODO : define this class.
+
+    /// @brief comment index in ToolPath::m_comments.
+    void setCommentIndex(int comment_index) { m_comment_index = comment_index; }
+  
+  private:
+    /// @brief index in ToolPath::m_comments, -1 if not set.
+    int m_comment_index{-1};
+
+    /// @brief index in ToolPath::m_data
+    int m_data_index{-1};
 };
 
 /// Tool path point class.
@@ -26,6 +37,9 @@ class ToolPathPoint {
 
     /// @brief get point index for location inherited from.
     int getLocationIndex() const { return m_point_location_index; }
+
+    /// @brief set comment index in ToolPath::m_comments.
+    void setCommentIndex(int comment_index);
   
   private:
     // Index of point (in ToolPath::m_points) this point has inherited location from (maybe the same point).
@@ -48,13 +62,22 @@ class ToolPath {
 
     /// @brief Finalize locations initialization (update location for last chunk of path points after last change).
     void finalizeLocations();
+
+    /// @brief Update comment for the given path point.
+    void setComment(int point_index, const std::string& comment_str);
   
   private:
-    // Actual path - sequence of points.
+    /// @brief Actual path - sequence of points.
     std::vector<ToolPathPoint> m_points;
 
-    // Locations map, key is index in m_points;
+    /// @brief Locations map, key is index in m_points;
     std::map<int, Vector3D> m_locations;
+
+    /// @brief comments set.
+    std::set<std::string> m_comments;
+
+    /// @brief data vector.
+    std::vector<Data3D> m_data;
 };
   
 } // namespace computational_geometry

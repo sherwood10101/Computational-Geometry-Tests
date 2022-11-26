@@ -10,6 +10,14 @@ void ToolPathPoint::setLocationIndex(int point_index) {
   m_point_location_index = point_index;
 }
 
+void ToolPathPoint::setCommentIndex(int comment_index) {
+  if (!m_data) {
+    m_data = ToolPathPointMetaData();
+  }
+
+  m_data->setCommentIndex(comment_index);
+}
+
 ToolPath::ToolPath(int n_points) : m_points(n_points) {
 }
 
@@ -61,6 +69,19 @@ void ToolPath::finalizeLocations() {
   for(int i = last_location_index + 1; i < n_points; i++) {
     m_points[i].setLocationIndex(last_location_index);
   }
+}
+
+void ToolPath::setComment(int point_index, const std::string& comment_str) {
+  // Check if comments exists in m_comments.
+  auto iter = m_comments.find(comment_str);
+  if (iter == m_comments.end()) {
+    m_comments.insert(comment_str);
+  }
+  iter = m_comments.find(comment_str);
+  assert(iter != m_comments.end());
+  int index = std::distance(m_comments.begin(), iter);
+
+  m_points[point_index].setCommentIndex(index);
 }
   
 } // namespace computational_geometry

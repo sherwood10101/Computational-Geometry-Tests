@@ -63,8 +63,19 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
   // Finalize locations initialization (update location for last chunk of path points).
   tool_path.finalizeLocations();
 
-  // TODO: Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
-  std::string comment(100, 'x');
+  // Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
+  std::string comment_str(100, 'x');
+  int step_comment_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_string_data), 1, n_points / 2);
+  //std::cout << "step_comment_avg = " << step_comment_avg << std::endl;
+  std::default_random_engine comment_step_generator;
+  double comment_sigma = std::clamp(step_comment_avg / 2., 5., n_points / 10.);
+  std::normal_distribution<double> step_comment_distribution(static_cast<double>(step_comment_avg), comment_sigma);
+  for(int i = 0; i < n_points;) {
+    tool_path.setComment(i, comment_str);
+    step = std::clamp(static_cast<int>(step_comment_distribution(comment_step_generator)), 1, n_points / 3);
+    //std::cout << "step = " << step << std::endl;
+    i += step;
+  }
 
   // TODO: Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats
 }
