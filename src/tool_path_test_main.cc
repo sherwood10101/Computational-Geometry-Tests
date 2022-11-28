@@ -60,9 +60,6 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
     i += step;
   }
 
-  // Finalize locations initialization (update location for last chunk of path points).
-  tool_path.finalizeLocations();
-
   // Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
   std::string comment_str(100, 'x');
   int step_comment_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_string_data), 1, n_points / 2);
@@ -77,7 +74,24 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
     i += step;
   }
 
-  // TODO: Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats
+  // Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats.
+  std::vector<float> data_1d(vector_data_size, 1.); // All 1s.
+  std::vector<std::vector<float>> data_2d(vector_data_size, data_1d);
+  computational_geometry::Data3D data_3d(vector_data_size, data_2d);
+  int step_data_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_3d_vector), 1, n_points / 2);
+  //std::cout << "step_data_avg = " << step_data_avg << std::endl;
+  std::default_random_engine data_step_generator;
+  double data_sigma = std::clamp(step_data_avg / 2., 5., n_points / 10.);
+  std::normal_distribution<double> step_data_distribution(static_cast<double>(step_data_avg), data_sigma);
+  for(int i = 0; i < n_points;) {
+    tool_path.setData(i, data_3d);
+    step = std::clamp(static_cast<int>(step_data_distribution(data_step_generator)), 1, n_points / 3);
+    //std::cout << "step = " << step << std::endl;
+    i += step;
+  }
+
+  // Finalize locations initialization (update location for last chunk of path points) + optimize Data3D memory.
+  tool_path.finalizeInitialization();
 }
 
 //////////////////////////////////////////////////////////////////////////////

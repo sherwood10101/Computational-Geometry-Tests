@@ -18,6 +18,14 @@ void ToolPathPoint::setCommentIndex(int comment_index) {
   m_data->setCommentIndex(comment_index);
 }
 
+void ToolPathPoint::setDataIndex(int data_index) {
+  if (!m_data) {
+    m_data = ToolPathPointMetaData();
+  }
+
+  m_data->setDataIndex(data_index);
+}
+
 ToolPath::ToolPath(int n_points) : m_points(n_points) {
 }
 
@@ -58,7 +66,7 @@ void ToolPath::setLocation(int point_index, const Vector3D& location) {
   m_points[point_index].setLocationIndex(point_index);
 }
 
-void ToolPath::finalizeLocations() {
+void ToolPath::finalizeInitialization() {
   // Get the last existing location.
   int last_location_index = m_locations.rbegin()->first;
   int n_points = m_points.size();
@@ -69,6 +77,9 @@ void ToolPath::finalizeLocations() {
   for(int i = last_location_index + 1; i < n_points; i++) {
     m_points[i].setLocationIndex(last_location_index);
   }
+
+  // Resize m_data to actual capacity to optimize memory.
+  m_data.shrink_to_fit();
 }
 
 void ToolPath::setComment(int point_index, const std::string& comment_str) {
@@ -82,6 +93,12 @@ void ToolPath::setComment(int point_index, const std::string& comment_str) {
   int index = std::distance(m_comments.begin(), iter);
 
   m_points[point_index].setCommentIndex(index);
+}
+
+void ToolPath::setData(int point_index, const Data3D& values) {
+  int index = m_data.size();
+  m_data.push_back(values);
+  m_points[point_index].setDataIndex(index);
 }
   
 } // namespace computational_geometry

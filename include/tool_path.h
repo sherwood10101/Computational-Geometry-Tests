@@ -18,6 +18,9 @@ class ToolPathPointMetaData {
 
     /// @brief comment index in ToolPath::m_comments.
     void setCommentIndex(int comment_index) { m_comment_index = comment_index; }
+
+    /// @brief data index in ToolPath::m_data.
+    void setDataIndex(int data_index) { m_data_index = data_index; }
   
   private:
     /// @brief index in ToolPath::m_comments, -1 if not set.
@@ -40,6 +43,9 @@ class ToolPathPoint {
 
     /// @brief set comment index in ToolPath::m_comments.
     void setCommentIndex(int comment_index);
+
+    /// @brief set data index in ToolPath::m_data.
+    void setDataIndex(int data_index);
   
   private:
     // Index of point (in ToolPath::m_points) this point has inherited location from (maybe the same point).
@@ -60,11 +66,14 @@ class ToolPath {
     /// @brief Update location for the given path point.
     void setLocation(int point_index, const Vector3D& location);
 
-    /// @brief Finalize locations initialization (update location for last chunk of path points after last change).
-    void finalizeLocations();
+    /// @brief Finalize initialization (update location for last chunk of path points after last change + optimize m_data memory).
+    void finalizeInitialization();
 
     /// @brief Update comment for the given path point.
     void setComment(int point_index, const std::string& comment_str);
+
+    /// @brief Update data for the given path point.
+    void setData(int point_index, const Data3D& values);
   
   private:
     /// @brief Actual path - sequence of points.
