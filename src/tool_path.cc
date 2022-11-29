@@ -100,5 +100,35 @@ void ToolPath::setData(int point_index, const Data3D& values) {
   m_data.push_back(values);
   m_points[point_index].setDataIndex(index);
 }
+
+ToolPathPointInfo ToolPath::getToolPathPointInfo(int point_index) const {
+  ToolPathPointInfo result;
+
+  const auto& path_point = m_points[point_index];
+
+  // Get location.
+  const auto location_index = path_point.getLocationIndex();
+  const auto iter = m_locations.find(location_index);
+  assert(iter != m_locations.end());
+  result.location = iter->second;
+
+  if (path_point.m_data) {
+    // Get comment string.
+    int comment_index = path_point.m_data->getCommentIndex();
+    if (comment_index >= 0) {
+      assert(comment_index < static_cast<int>(m_comments.size()));
+      result.comment = *std::next(m_comments.begin(), comment_index);
+    }
+
+    // Get data.
+    int data_index = path_point.m_data->getDataIndex();
+    if (data_index >= 0) {
+      assert(data_index < static_cast<int>(m_data.size()));
+      result.data = m_data[data_index];
+    }
+  }
+
+  return result;
+}
   
 } // namespace computational_geometry

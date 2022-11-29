@@ -18,15 +18,17 @@ class ToolPathPointMetaData {
 
     /// @brief comment index in ToolPath::m_comments.
     void setCommentIndex(int comment_index) { m_comment_index = comment_index; }
+    int getCommentIndex() const { return m_comment_index; }
 
     /// @brief data index in ToolPath::m_data.
     void setDataIndex(int data_index) { m_data_index = data_index; }
+    int getDataIndex() const { return m_data_index; }
   
   private:
     /// @brief index in ToolPath::m_comments, -1 if not set.
     int m_comment_index{-1};
 
-    /// @brief index in ToolPath::m_data
+    /// @brief index in ToolPath::m_data, -1 if not set.
     int m_data_index{-1};
 };
 
@@ -53,6 +55,20 @@ class ToolPathPoint {
 
     // Data associated with this path point.
     std::optional<ToolPathPointMetaData> m_data{std::nullopt};
+
+    friend class ToolPath;
+};
+
+/// Structure for path point data, used for queries.
+struct ToolPathPointInfo {
+  /// @brief Actual location of path point.
+  Vector3D location;
+
+  /// @brief Comment string (if assigned).
+  std::optional<std::string> comment{std::nullopt};
+
+  /// @brief Data.
+  std::optional<Data3D> data{std::nullopt};
 };
 
 /// Top-level class for ToolPath object.
@@ -74,6 +90,11 @@ class ToolPath {
 
     /// @brief Update data for the given path point.
     void setData(int point_index, const Data3D& values);
+
+    /// @brief Get path point info.
+    /// @param point_index index in m_points.
+    /// @returns path point data.
+    ToolPathPointInfo getToolPathPointInfo(int point_index) const;
   
   private:
     /// @brief Actual path - sequence of points.

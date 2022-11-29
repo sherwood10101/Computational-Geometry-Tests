@@ -172,7 +172,29 @@ int main (const int argc, char **const argv)
   std::cout << "ToolPath object created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
-  // 2. TODO: Track performance for sequential access of all data (full toolpath).
+  // 2. Track performance for sequential access of all data (full toolpath).
+  int n_points = tool_path.numPoints();
+  std::cout << "Sequentially access all path points..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  //std::cout << "n_points = " << n_points << std::endl;
+  const bool debug_output = false;
+  for(int i = 0; i < n_points; i++) {
+    const auto path_point_data = tool_path.getToolPathPointInfo(i);
+    if (debug_output) {
+      std::cout << "Index: " << i << " , location = (" << path_point_data.location[0] << ", "
+                << path_point_data.location[1] << ", " << path_point_data.location[2] << ")" << std::endl;
+      if (path_point_data.comment) {
+        std::cout << "  Comment: " << *path_point_data.comment << std::endl;
+      }
+      if (path_point_data.data) {
+        std::cout << "  3D data is there, first element: " << (*path_point_data.data)[0][0][0] << std::endl;
+      }
+    }
+  }
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Sequential access of all points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
   
   // 3. TODO: Track performance for random access of 10% of the data.
 
