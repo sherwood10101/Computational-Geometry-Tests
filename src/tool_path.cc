@@ -130,5 +130,15 @@ ToolPathPointInfo ToolPath::getToolPathPointInfo(int point_index) const {
 
   return result;
 }
+
+void ToolPath::cleanUpMetaData() {
+  std::vector<Data3D>().swap(m_data);
+  m_comments.clear();
+
+  int n_points = m_points.size();
+  for(int i = 0; i < n_points; i++) {
+    m_points[i].m_data =  std::nullopt;
+  }
+}
   
 } // namespace computational_geometry

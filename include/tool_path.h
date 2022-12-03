@@ -95,6 +95,9 @@ class ToolPath {
     /// @param point_index index in m_points.
     /// @returns path point data.
     ToolPathPointInfo getToolPathPointInfo(int point_index) const;
+
+    /// @brief Utility to cleanup metadat for all path points.
+    void cleanUpMetaData();
   
   private:
     /// @brief Actual path - sequence of points.

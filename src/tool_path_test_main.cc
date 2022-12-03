@@ -200,7 +200,7 @@ int main (const int argc, char **const argv)
   double percentage_of_points_to_access = 10.;
   int n_points_to_query = std::clamp(static_cast<int>((percentage_of_points_to_access / 100.) * n_points), 1, n_points);
   //std::cout << "n_points_to_query = " << n_points_to_query << std::endl;
-  std::cout << "Performing random access of " << percentage_of_points_to_access << " % of the path points"<< std::endl;
+  std::cout << "Performing random access of " << percentage_of_points_to_access << "% of the path points"<< std::endl;
   start = std::chrono::steady_clock::now();
   std::default_random_engine point_index_generator;
   std::uniform_int_distribution<int> point_index_distribution(0, n_points - 1);
@@ -221,13 +221,32 @@ int main (const int argc, char **const argv)
   }
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Randon access of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  std::cout << "Random access of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
-  // 4. TODO: Track performance for downgrading points to the minimum 
+  // 4. Track performance for downgrading points to the minimum 
   //    (replace all upgraded nodes with simplest version with no metadata).
+  std::cout << "Performing cleanup of metadata for all path points..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  tool_path.cleanUpMetaData();
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Metadata cleanup finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
-  // 5. TODO: Track performance to randomly insert 10% new nodes with random metadata as above.
+  // 5. Track performance to randomly insert 10% new nodes with random metadata as above.
+  double percentage_of_points_to_insert = 10.;
+  std::cout << "Performing random insertion of " << percentage_of_points_to_access << "% of the new path points"<< std::endl;
+  int n_new_points = std::clamp(static_cast<int>((percentage_of_points_to_insert / 100.) * n_points), 1, n_points);
+  //std::cout << "n_new_points = " << n_new_points << std::endl;
+  for(int i = 0; i < n_new_points; i++) {
+    int point_index = point_index_distribution(point_index_generator);
+    //std::cout << "point_index = " << point_index << std::endl;
+  }
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Random insertion of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
   return 0;
 }
