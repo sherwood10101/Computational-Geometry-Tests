@@ -60,13 +60,38 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
     i += step;
   }
 
-  // Finalize locations initialization (update location for last chunk of path points).
-  tool_path.finalizeLocations();
+  // Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
+  std::string comment_str(100, 'x');
+  int step_comment_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_string_data), 1, n_points / 2);
+  //std::cout << "step_comment_avg = " << step_comment_avg << std::endl;
+  std::default_random_engine comment_step_generator;
+  double comment_sigma = std::clamp(step_comment_avg / 2., 5., n_points / 10.);
+  std::normal_distribution<double> step_comment_distribution(static_cast<double>(step_comment_avg), comment_sigma);
+  for(int i = 0; i < n_points;) {
+    tool_path.setComment(i, comment_str);
+    step = std::clamp(static_cast<int>(step_comment_distribution(comment_step_generator)), 1, n_points / 3);
+    //std::cout << "step = " << step << std::endl;
+    i += step;
+  }
 
-  // TODO: Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
-  std::string comment(100, 'x');
+  // Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats.
+  std::vector<float> data_1d(vector_data_size, 1.); // All 1s.
+  std::vector<std::vector<float>> data_2d(vector_data_size, data_1d);
+  computational_geometry::Data3D data_3d(vector_data_size, data_2d);
+  int step_data_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_3d_vector), 1, n_points / 2);
+  //std::cout << "step_data_avg = " << step_data_avg << std::endl;
+  std::default_random_engine data_step_generator;
+  double data_sigma = std::clamp(step_data_avg / 2., 5., n_points / 10.);
+  std::normal_distribution<double> step_data_distribution(static_cast<double>(step_data_avg), data_sigma);
+  for(int i = 0; i < n_points;) {
+    tool_path.setData(i, data_3d);
+    step = std::clamp(static_cast<int>(step_data_distribution(data_step_generator)), 1, n_points / 3);
+    //std::cout << "step = " << step << std::endl;
+    i += step;
+  }
 
-  // TODO: Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats
+  // Finalize locations initialization (update location for last chunk of path points) + optimize Data3D memory.
+  tool_path.finalizeInitialization();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -147,7 +172,29 @@ int main (const int argc, char **const argv)
   std::cout << "ToolPath object created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
-  // 2. TODO: Track performance for sequential access of all data (full toolpath).
+  // 2. Track performance for sequential access of all data (full toolpath).
+  int n_points = tool_path.numPoints();
+  std::cout << "Sequentially access all path points..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  //std::cout << "n_points = " << n_points << std::endl;
+  const bool debug_output = false;
+  for(int i = 0; i < n_points; i++) {
+    const auto path_point_data = tool_path.getToolPathPointInfo(i);
+    if (debug_output) {
+      std::cout << "Index: " << i << " , location = (" << path_point_data.location[0] << ", "
+                << path_point_data.location[1] << ", " << path_point_data.location[2] << ")" << std::endl;
+      if (path_point_data.comment) {
+        std::cout << "  Comment: " << *path_point_data.comment << std::endl;
+      }
+      if (path_point_data.data) {
+        std::cout << "  3D data is there, first element: " << (*path_point_data.data)[0][0][0] << std::endl;
+      }
+    }
+  }
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Sequential access of all points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
   
   // 3. TODO: Track performance for random access of 10% of the data.
 
