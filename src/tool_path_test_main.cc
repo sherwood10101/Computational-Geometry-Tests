@@ -32,10 +32,10 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
   std::normal_distribution<double> step_distribution(static_cast<double>(step_coord_change_avg), sigma);
 
   std::default_random_engine coord_index_generator;
-  std::uniform_int_distribution<int> coord_index_distribution(0,2);
+  std::uniform_int_distribution<int> coord_index_distribution(0, 2);
 
   std::default_random_engine velocity_generator;
-  std::uniform_real_distribution<double> velocity_distribution(-5.0,10.0);
+  std::uniform_real_distribution<double> velocity_distribution(-5.0, 10.0);
 
   int n_points = tool_path.numPoints();
   computational_geometry::Vector3D location_prev;
@@ -196,7 +196,33 @@ int main (const int argc, char **const argv)
   std::cout << "Sequential access of all points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
   
-  // 3. TODO: Track performance for random access of 10% of the data.
+  // 3. Track performance for random access of 10% of the data.
+  double percentage_of_points_to_access = 10.;
+  int n_points_to_query = std::clamp(static_cast<int>((percentage_of_points_to_access / 100.) * n_points), 1, n_points);
+  //std::cout << "n_points_to_query = " << n_points_to_query << std::endl;
+  std::cout << "Performing random access of " << percentage_of_points_to_access << " % of the path points"<< std::endl;
+  start = std::chrono::steady_clock::now();
+  std::default_random_engine point_index_generator;
+  std::uniform_int_distribution<int> point_index_distribution(0, n_points - 1);
+  for(int i = 0; i < n_points_to_query; i++) {
+    int point_index = point_index_distribution(point_index_generator);
+    //std::cout << "point index = " << point_index << std::endl;
+    const auto path_point_data = tool_path.getToolPathPointInfo(point_index);
+    if (debug_output) {
+      std::cout << "Index: " << i << " , location = (" << path_point_data.location[0] << ", "
+                << path_point_data.location[1] << ", " << path_point_data.location[2] << ")" << std::endl;
+      if (path_point_data.comment) {
+        std::cout << "  Comment: " << *path_point_data.comment << std::endl;
+      }
+      if (path_point_data.data) {
+        std::cout << "  3D data is there, first element: " << (*path_point_data.data)[0][0][0] << std::endl;
+      }
+    }
+  }
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Randon access of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
   // 4. TODO: Track performance for downgrading points to the minimum 
   //    (replace all upgraded nodes with simplest version with no metadata).
