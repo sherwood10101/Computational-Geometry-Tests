@@ -140,5 +140,9 @@ void ToolPath::cleanUpMetaData() {
     m_points[i].m_data =  std::nullopt;
   }
 }
+
+void ToolPath::InsertPathPoint(int point_index, const Vector3D& location) {
+  // TODO : implement this function.
+}
   
 } // namespace computational_geometry

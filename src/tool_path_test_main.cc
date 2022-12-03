@@ -239,9 +239,36 @@ int main (const int argc, char **const argv)
   std::cout << "Performing random insertion of " << percentage_of_points_to_access << "% of the new path points"<< std::endl;
   int n_new_points = std::clamp(static_cast<int>((percentage_of_points_to_insert / 100.) * n_points), 1, n_points);
   //std::cout << "n_new_points = " << n_new_points << std::endl;
+  std::default_random_engine location_generator;
+  std::uniform_real_distribution<float> location_distribution(-1e+06, 1e+06);
+  std::default_random_engine metadata_probability_generator;
+  std::uniform_real_distribution<float> metadata_probability_distribution(0., 1.0);
+  std::string comment_str(100, 'y');
+  std::vector<float> data_1d(vector_data_size, 0.); // All 0s.
+  std::vector<std::vector<float>> data_2d(vector_data_size, data_1d);
+  computational_geometry::Data3D data_3d(vector_data_size, data_2d);
+  float probability_comment = nodes_percentage_with_string_data / 100.;
+  float probability_data = nodes_percentage_with_3d_vector / 100.;
   for(int i = 0; i < n_new_points; i++) {
     int point_index = point_index_distribution(point_index_generator);
     //std::cout << "point_index = " << point_index << std::endl;
+    float x = location_distribution(location_generator);
+    float y = location_distribution(location_generator);
+    float z = location_distribution(location_generator);
+    computational_geometry::Vector3D location{x, y, z};
+    tool_path.InsertPathPoint(point_index, location);
+
+    // As in the original tool_path object, 1% of new path points must have comment string.
+    float probability = metadata_probability_distribution(metadata_probability_generator);
+    if (probability < probability_comment) {
+      tool_path.setComment(point_index, comment_str);
+    }
+
+    // As in the original tool_path object, 0.1% of new path points must have Data3D annotated.
+    probability = metadata_probability_distribution(metadata_probability_generator);
+    if (probability < probability_data) {
+      tool_path.setData(point_index, data_3d);
+    }
   }
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;

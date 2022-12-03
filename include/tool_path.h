@@ -96,8 +96,12 @@ class ToolPath {
     /// @returns path point data.
     ToolPathPointInfo getToolPathPointInfo(int point_index) const;
 
-    /// @brief Utility to cleanup metadat for all path points.
+    /// @brief Utility to cleanup metadata for all path points.
     void cleanUpMetaData();
+
+    /// @brief Insertion of new path point at the given index.
+    /// If index is larger or equal than numPoints(), ((point_index - numPoints()) + 1) new points will be added.
+    void InsertPathPoint(int point_index, const Vector3D& location); 
   
   private:
     /// @brief Actual path - sequence of points.
