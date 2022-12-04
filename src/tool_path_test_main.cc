@@ -249,27 +249,40 @@ int main (const int argc, char **const argv)
   computational_geometry::Data3D data_3d(vector_data_size, data_2d);
   float probability_comment = nodes_percentage_with_string_data / 100.;
   float probability_data = nodes_percentage_with_3d_vector / 100.;
-  for(int i = 0; i < n_new_points; i++) {
-    int point_index = point_index_distribution(point_index_generator);
-    //std::cout << "point_index = " << point_index << std::endl;
+  float probability_insertion = percentage_of_points_to_insert / 100.;
+  int points_added = 0;
+  for(tool_path.getFirst(); tool_path.getNext();) {
+    if (points_added > n_new_points) {
+      break;
+    }
+
+    float probability = metadata_probability_distribution(metadata_probability_generator);
+    if (probability > probability_insertion) {
+      continue;
+    }
+    points_added++;
+
     float x = location_distribution(location_generator);
     float y = location_distribution(location_generator);
     float z = location_distribution(location_generator);
     computational_geometry::Vector3D location{x, y, z};
-    tool_path.InsertPathPoint(point_index, location);
 
     // As in the original tool_path object, 1% of new path points must have comment string.
-    float probability = metadata_probability_distribution(metadata_probability_generator);
+    std::optional<std::string> comment_cur{std::nullopt};
+    probability = metadata_probability_distribution(metadata_probability_generator);
     if (probability < probability_comment) {
-      tool_path.setComment(point_index, comment_str);
+      comment_cur = comment_str;
     }
 
     // As in the original tool_path object, 0.1% of new path points must have Data3D annotated.
+    std::optional<computational_geometry::Data3D> data3d_cur{std::nullopt};
     probability = metadata_probability_distribution(metadata_probability_generator);
     if (probability < probability_data) {
-      tool_path.setData(point_index, data_3d);
+      data3d_cur = data_3d;
     }
+    tool_path.InsertPathPointAtCurrentPosition(location, comment_cur, data3d_cur);
   }
+  tool_path.updatePointIndices();
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
   std::cout << "Random insertion of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;

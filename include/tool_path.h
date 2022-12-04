@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <map>
+#include <list>
 #include <optional>
 #include <set>
 #include <vector>
@@ -37,11 +37,11 @@ class ToolPathPoint {
   public:
     ToolPathPoint() {}
 
-    /// @brief set index of point this point has inherited location from.
-    void setLocationIndex(int point_index);
+    /// @brief set location index in ToolPath::m_locations.
+    void setLocationIndex(int location_index);
 
-    /// @brief get point index for location inherited from.
-    int getLocationIndex() const { return m_point_location_index; }
+    /// @brief get location index in ToolPath::m_locations.
+    int getLocationIndex() const { return m_location_index; }
 
     /// @brief set comment index in ToolPath::m_comments.
     void setCommentIndex(int comment_index);
@@ -50,8 +50,8 @@ class ToolPathPoint {
     void setDataIndex(int data_index);
   
   private:
-    // Index of point (in ToolPath::m_points) this point has inherited location from (maybe the same point).
-    int m_point_location_index{0};
+    // Index of location (in ToolPath::m_locations) this point has inherited location from.
+    int m_location_index{-1};
 
     // Data associated with this path point.
     std::optional<ToolPathPointMetaData> m_data{std::nullopt};
@@ -77,7 +77,7 @@ class ToolPath {
     ToolPath(int n_points);
 
     /// @returns number of path points.
-    int numPoints() const {return m_points.size();}
+    int numPoints() const {return m_path.size();}
 
     /// @brief Update location for the given path point.
     void setLocation(int point_index, const Vector3D& location);
@@ -94,21 +94,45 @@ class ToolPath {
     /// @brief Get path point info.
     /// @param point_index index in m_points.
     /// @returns path point data.
-    ToolPathPointInfo getToolPathPointInfo(int point_index) const;
+    ToolPathPointInfo getToolPathPointInfo(int point_index);
 
     /// @brief Utility to cleanup metadata for all path points.
     void cleanUpMetaData();
 
-    /// @brief Insertion of new path point at the given index.
-    /// If index is larger or equal than numPoints(), ((point_index - numPoints()) + 1) new points will be added.
-    void InsertPathPoint(int point_index, const Vector3D& location); 
+    /// @brief Insertion of new path point at current path position.
+    void InsertPathPointAtCurrentPosition(const Vector3D& location,
+                                          std::optional<std::string> comment = std::nullopt,
+                                          std::optional<Data3D> data_3d = std::nullopt); 
+
+    /// @brief Utility to synchronize m_path and m_point_indices_map after
+    /// path modifications (insertion/deletion of path points).
+    void updatePointIndices();
+
+    /// @brief utility to set m_current_position to the beginning of m_path.
+    void getFirst();
+
+    /// @brief utility to increment m_current_position to the next position in m_path.
+    /// @returns false if current position is at the end of the list already.
+    bool getNext();
   
   private:
     /// @brief Actual path - sequence of points.
-    std::vector<ToolPathPoint> m_points;
+    std::list<ToolPathPoint> m_path;
 
-    /// @brief Locations map, key is index in m_points;
-    std::map<int, Vector3D> m_locations;
+    /// @brief current position in the path.
+    std::list<ToolPathPoint>::iterator m_current_position;
+
+    /// @brief flag indicating that m_current_position is set to something.
+    bool m_current_position_set{false};
+
+    /// @brief vector to get ToolPathPoint by index.
+    std::vector<ToolPathPoint*> m_point_indices_map;
+
+    /// @brief flag indicating that m_points_indices_map container invalidated because of insertion/deletion of new path points.
+    bool m_point_indices_valid{true};
+
+    /// @brief Locations vector.
+    std::vector<Vector3D> m_locations;
 
     /// @brief comments set.
     std::set<std::string> m_comments;
