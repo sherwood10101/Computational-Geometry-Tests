@@ -717,14 +717,46 @@ int Execute( int argc , char* argv[] )
 
 namespace computational_geometry {
 
+/*! Create command line argc and argv from input parameters
+ *  So that you can use Poisson mesh reconstruction functions that require command line input
+ */
+void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params)
+{
+    argc = 2 * 50 + 1; // 2 * number of params plus 1
+	char* argStrs[argc];
+    
+	std::string tempStr = params.programName;
+	argStrs[0] = tempStr.c_str;
+	//argStrs.push_back(tempStr.c_str);
+	
+	//argStrs.push_back((params.programName).c_str);
+
+    argv = argStrs;
+	std::assert(argv.length() == argc);
+}
+
 // PoissonMeshReconstructor class implementation
 void PoissonMeshReconstructor::Run() 
 {
 	std::cout << "Running PoissonRecon..." << std::endl;
 	
-	int argc = 5;
+	//int argc = 5;
+	//char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
+	//const_cast<char*>(m_output_ply_file.c_str()) };
+
+	//std::string tmp = std::to_string(m_depth);
+	std::string tmp = std::to_string(m_params.depth);
+	char const *depth_char = tmp.c_str();
+
+	int argc = 7;
+    char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_params.inputFilename.c_str()), "--out", 
+	const_cast<char*>(m_params.outputFilename.c_str()),
+	const_cast<char*>(depth_char), "--depth" };
+	/*
 	char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
-	const_cast<char*>(m_output_ply_file.c_str()) };
+	const_cast<char*>(m_output_ply_file.c_str()),
+	const_cast<char*>(depth_char), "--depth" };
+	*/
 
 	double t = Time();
 	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
@@ -746,5 +778,45 @@ void PoissonMeshReconstructor::Run()
 				else             Execute< float  , PlyVertex< float > >( argc , argv );
 	}
 }
+
+/* old version
+// PoissonMeshReconstructor class implementation
+void PoissonMeshReconstructor::Run() 
+{
+	std::cout << "Running PoissonRecon..." << std::endl;
+	
+	//int argc = 5;
+	//char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
+	//const_cast<char*>(m_output_ply_file.c_str()) };
+
+	std::string tmp = std::to_string(m_depth);
+	char const *depth_char = tmp.c_str();
+
+	int argc = 7;
+	char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
+	const_cast<char*>(m_output_ply_file.c_str()),
+	const_cast<char*>(depth_char), "--depth" };
+
+	double t = Time();
+	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+
+	{
+		if( Density.set )
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorAndValueVertex< float > >( argc , argv );
+				else             Execute< float  , PlyColorAndValueVertex< float > >( argc , argv );
+			else
+				if( Double.set ) Execute< double , PlyValueVertex< float > >( argc , argv );
+				else             Execute< float  , PlyValueVertex< float > >( argc , argv );
+		else
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorVertex< float > >( argc , argv );
+				else             Execute< float  , PlyColorVertex< float > >( argc , argv );
+			else
+				if( Double.set ) Execute< double , PlyVertex< float > >( argc , argv );
+				else             Execute< float  , PlyVertex< float > >( argc , argv );
+	}
+}
+*/
 
 } // namespace computational_geometry

@@ -69,7 +69,17 @@ int main (const int argc, char **const argv)
 
   std::string points_file("points.txt");
   writePointsFile(points_file, mesh_loader.getMesh());
-  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file);
+  int depth = 3;
+
+  computational_geometry::PoissonParams params;
+  params.programName = "computational_geometry_template_main.cc";
+  params.inputFilename = points_file;
+  params.outputFilename = argv[2];
+  params.depth = 12;
+
+  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(params);
+  // computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file, depth);
+
   mesh_reconstructor.Run();
   if (fs::exists(points_file)) {
     remove(points_file.c_str());
