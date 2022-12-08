@@ -4,6 +4,7 @@
 
 namespace computational_geometry {
 
+/*
 struct PoissonParams
 {
     std::string programName; // added - becomes argv[0]
@@ -62,11 +63,13 @@ struct PoissonParams
 /*! Create command line argc and argv from input parameters
  *  So that you can use Poisson mesh reconstruction functions that require command line input
  */
-void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params);
+
+// void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params);
 
 
 /// Top-level class to perform Poisson mesh reconstruction of point cloud with vertex normals
 
+/*
 class PoissonMeshReconstructor {
   public:
     PoissonMeshReconstructor(const PoissonParams& params) : 
@@ -79,8 +82,9 @@ class PoissonMeshReconstructor {
       PoissonParams m_params;
 
 };
+*/
 
-/*  Old version for reference
+//  Old version for reference
 class PoissonMeshReconstructor {
   public:
     PoissonMeshReconstructor(const std::string& input_points_file, 
@@ -97,6 +101,6 @@ class PoissonMeshReconstructor {
      std::string m_output_ply_file;
      int m_depth;
 };
-*/
+
   
 } // namespace computational_geometry

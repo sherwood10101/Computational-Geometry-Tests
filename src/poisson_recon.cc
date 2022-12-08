@@ -720,6 +720,8 @@ namespace computational_geometry {
 /*! Create command line argc and argv from input parameters
  *  So that you can use Poisson mesh reconstruction functions that require command line input
  */
+
+/*
 void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params)
 {
     argc = 2 * 50 + 1; // 2 * number of params plus 1
@@ -758,6 +760,8 @@ void PoissonMeshReconstructor::Run()
 	const_cast<char*>(depth_char), "--depth" };
 	*/
 
+
+/*
 	double t = Time();
 	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
 
@@ -778,8 +782,9 @@ void PoissonMeshReconstructor::Run()
 				else             Execute< float  , PlyVertex< float > >( argc , argv );
 	}
 }
+*/
 
-/* old version
+// old version
 // PoissonMeshReconstructor class implementation
 void PoissonMeshReconstructor::Run() 
 {
@@ -817,6 +822,6 @@ void PoissonMeshReconstructor::Run()
 				else             Execute< float  , PlyVertex< float > >( argc , argv );
 	}
 }
-*/
+
 
 } // namespace computational_geometry
