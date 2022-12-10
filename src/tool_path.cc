@@ -281,8 +281,46 @@ void ToolPath::InsertPathPointAtCurrentPosition(const Vector3D& location,
   }
 }
 
-void ToolPath::append(const ToolPath& other_path) {
-  // TODO : implement this function.
+void ToolPath::append(ToolPath& other_path) {
+  // 1. Make sure paths have consistent data.
+  updatePointIndices();
+  other_path.updatePointIndices();
+  int n_points_orig =  numPoints();
+  int n_locations_orig =  m_locations.size();
+  int n_data_orig =  m_data.size();
+
+  // 2. Update locations.
+  m_locations.insert(m_locations.end(), other_path.m_locations.begin(), other_path.m_locations.end());
+  for(auto& path_point : other_path.m_path) {
+    path_point.setLocationIndex(path_point.getLocationIndex() + n_locations_orig);
+  }
+
+  // 3. Update data.
+  m_data.insert(m_data.end(), other_path.m_data.begin(), other_path.m_data.end());
+  for(auto& path_point : other_path.m_path) {
+    if (path_point.m_data) {
+      int data_index_orig = path_point.m_data->getDataIndex();
+      if (data_index_orig >= 0) {
+        path_point.m_data->setDataIndex(data_index_orig + n_data_orig);
+      }
+    }
+  }
+
+  // 4. TODO: Update comments.
+  std::set<std::string> other_comments = other_path.m_comments;
+  for(const auto other_comment : other_comments) {
+    m_comments.insert(other_comment);
+  }
+
+  // 5. TODO : Append path points.
+
+  // 6. Resize m_data to actual capacity to optimize memory.
+  m_data.shrink_to_fit();
+  m_locations.shrink_to_fit();
+
+  // 7. Update point indices.
+  m_point_indices_valid = false;
+  updatePointIndices();
 }
   
 } // namespace computational_geometry
