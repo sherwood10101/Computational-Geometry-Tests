@@ -32,10 +32,10 @@ void fill_tool_path(computational_geometry::ToolPath& tool_path, int step_coord_
   std::normal_distribution<double> step_distribution(static_cast<double>(step_coord_change_avg), sigma);
 
   std::default_random_engine coord_index_generator;
-  std::uniform_int_distribution<int> coord_index_distribution(0,2);
+  std::uniform_int_distribution<int> coord_index_distribution(0, 2);
 
   std::default_random_engine velocity_generator;
-  std::uniform_real_distribution<double> velocity_distribution(-5.0,10.0);
+  std::uniform_real_distribution<double> velocity_distribution(-5.0, 10.0);
 
   int n_points = tool_path.numPoints();
   computational_geometry::Vector3D location_prev;
@@ -196,12 +196,97 @@ int main (const int argc, char **const argv)
   std::cout << "Sequential access of all points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
   
-  // 3. TODO: Track performance for random access of 10% of the data.
+  // 3. Track performance for random access of 10% of the data.
+  double percentage_of_points_to_access = 10.;
+  int n_points_to_query = std::clamp(static_cast<int>((percentage_of_points_to_access / 100.) * n_points), 1, n_points);
+  //std::cout << "n_points_to_query = " << n_points_to_query << std::endl;
+  std::cout << "Performing random access of " << percentage_of_points_to_access << "% of the path points"<< std::endl;
+  start = std::chrono::steady_clock::now();
+  std::default_random_engine point_index_generator;
+  std::uniform_int_distribution<int> point_index_distribution(0, n_points - 1);
+  for(int i = 0; i < n_points_to_query; i++) {
+    int point_index = point_index_distribution(point_index_generator);
+    //std::cout << "point index = " << point_index << std::endl;
+    const auto path_point_data = tool_path.getToolPathPointInfo(point_index);
+    if (debug_output) {
+      std::cout << "Index: " << i << " , location = (" << path_point_data.location[0] << ", "
+                << path_point_data.location[1] << ", " << path_point_data.location[2] << ")" << std::endl;
+      if (path_point_data.comment) {
+        std::cout << "  Comment: " << *path_point_data.comment << std::endl;
+      }
+      if (path_point_data.data) {
+        std::cout << "  3D data is there, first element: " << (*path_point_data.data)[0][0][0] << std::endl;
+      }
+    }
+  }
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Random access of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
-  // 4. TODO: Track performance for downgrading points to the minimum 
+  // 4. Track performance for downgrading points to the minimum 
   //    (replace all upgraded nodes with simplest version with no metadata).
+  std::cout << "Performing cleanup of metadata for all path points..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  tool_path.cleanUpMetaData();
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Metadata cleanup finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
-  // 5. TODO: Track performance to randomly insert 10% new nodes with random metadata as above.
+  // 5. Track performance to randomly insert 10% new nodes with random metadata as above.
+  double percentage_of_points_to_insert = 10.;
+  std::cout << "Performing random insertion of " << percentage_of_points_to_access << "% of the new path points"<< std::endl;
+  int n_new_points = std::clamp(static_cast<int>((percentage_of_points_to_insert / 100.) * n_points), 1, n_points);
+  //std::cout << "n_new_points = " << n_new_points << std::endl;
+  std::default_random_engine location_generator;
+  std::uniform_real_distribution<float> location_distribution(-1e+06, 1e+06);
+  std::default_random_engine metadata_probability_generator;
+  std::uniform_real_distribution<float> metadata_probability_distribution(0., 1.0);
+  std::string comment_str(100, 'y');
+  std::vector<float> data_1d(vector_data_size, 0.); // All 0s.
+  std::vector<std::vector<float>> data_2d(vector_data_size, data_1d);
+  computational_geometry::Data3D data_3d(vector_data_size, data_2d);
+  float probability_comment = nodes_percentage_with_string_data / 100.;
+  float probability_data = nodes_percentage_with_3d_vector / 100.;
+  float probability_insertion = percentage_of_points_to_insert / 100.;
+  int points_added = 0;
+  for(tool_path.getFirst(); tool_path.getNext();) {
+    if (points_added > n_new_points) {
+      break;
+    }
+
+    float probability = metadata_probability_distribution(metadata_probability_generator);
+    if (probability > probability_insertion) {
+      continue;
+    }
+    points_added++;
+
+    float x = location_distribution(location_generator);
+    float y = location_distribution(location_generator);
+    float z = location_distribution(location_generator);
+    computational_geometry::Vector3D location{x, y, z};
+
+    // As in the original tool_path object, 1% of new path points must have comment string.
+    std::optional<std::string> comment_cur{std::nullopt};
+    probability = metadata_probability_distribution(metadata_probability_generator);
+    if (probability < probability_comment) {
+      comment_cur = comment_str;
+    }
+
+    // As in the original tool_path object, 0.1% of new path points must have Data3D annotated.
+    std::optional<computational_geometry::Data3D> data3d_cur{std::nullopt};
+    probability = metadata_probability_distribution(metadata_probability_generator);
+    if (probability < probability_data) {
+      data3d_cur = data_3d;
+    }
+    tool_path.InsertPathPointAtCurrentPosition(location, comment_cur, data3d_cur);
+  }
+  tool_path.updatePointIndices();
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Random insertion of path points finished, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
   return 0;
 }

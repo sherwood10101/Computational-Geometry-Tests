@@ -94,11 +94,13 @@ target_link_libraries(computational_geometry_template stdc++fs pthread OpenMeshC
 add_dependencies(computational_geometry_template OpenMesh GeometricTools polyscope)
 
 # ToolPath library
+#find_package(OpenMP REQUIRED)
 file(
   GLOB_RECURSE TOOLPATH_SRC_FILES
   src/tool_path.cc)
 
 add_library(ToolPath ${TOOLPATH_SRC_FILES})
+#target_link_libraries(ToolPath PRIVATE OpenMP::OpenMP_CXX)
 
 # ToolPath test executable
 add_executable(tool_path_test src/tool_path_test_main.cc)
