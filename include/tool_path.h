@@ -114,6 +114,10 @@ class ToolPath {
     /// @brief utility to increment m_current_position to the next position in m_path.
     /// @returns false if current position is at the end of the list already.
     bool getNext();
+
+    /// @brief utility to append other_path to the end of the given one.
+    /// @note: This procedure invalidates content of the other_path.
+    void append(const ToolPath& other_path);
   
   private:
     /// @brief Actual path - sequence of points.

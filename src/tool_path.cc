@@ -280,5 +280,9 @@ void ToolPath::InsertPathPointAtCurrentPosition(const Vector3D& location,
     path_point->setDataIndex(index);
   }
 }
+
+void ToolPath::append(const ToolPath& other_path) {
+  // TODO : implement this function.
+}
   
 } // namespace computational_geometry

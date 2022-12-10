@@ -314,5 +314,33 @@ int main (const int argc, char **const argv)
   testRandomSinglePointInsertion(tool_path, percentage_of_points_to_insert, 
                                  nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
 
+  // 6. Create 2 paths of the 1/3 size and add one path to the end of another.
+  int n_points_short = n_points_total / 3;
+  std::cout << "Re-creating 2 ToolPath objects of 1/3 size..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  tool_path = computational_geometry::ToolPath(n_points_short);
+  fillToolPath(tool_path, step_coord_change_avg, vector_data_size, 
+               nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+  computational_geometry::ToolPath tool_path2(n_points_short);
+  fillToolPath(tool_path2, step_coord_change_avg, vector_data_size, 
+               nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "2 ToolPath objects created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
+
+  std::cout << "Appending second ToolPath objects to the end of the first one..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  tool_path.append(tool_path2);
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Addition done, combined ToolPath size = " << tool_path.numPoints() 
+            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
+  
+  // 7. TODO: Insert second path one more time, but into the middle of combined path.
+
+  // 8. TODO: Create 1000 paths with 1000 points each and insert them randomly into combined path.
+
   return 0;
 }
