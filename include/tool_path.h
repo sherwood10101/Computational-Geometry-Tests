@@ -74,6 +74,7 @@ struct ToolPathPointInfo {
 /// Top-level class for ToolPath object.
 class ToolPath {
   public:
+    ToolPath(const ToolPath& other_tool_path);
     ToolPath(int n_points);
 
     /// @returns number of path points.
@@ -121,6 +122,10 @@ class ToolPath {
 
     /// @brief utility to clear all the data in ToolPath.
     void clear();
+
+    /// @brief insertion of other tool path at given index.
+    /// @note: This procedure invalidates content of the other_path.
+    void insert(int point_index, ToolPath& other_path);
   
   private:
     /// @brief Actual path - sequence of points.

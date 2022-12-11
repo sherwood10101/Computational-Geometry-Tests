@@ -40,6 +40,7 @@ void fillToolPath(computational_geometry::ToolPath& tool_path, int step_coord_ch
   int n_points = tool_path.numPoints();
   computational_geometry::Vector3D location_prev;
   int step = 1;
+  //std::cout << "n_points = " << n_points << std::endl;
   for(int i = 0; i < n_points;) {
     if (i == 0) {
       // Set initial trajectory location.
@@ -56,7 +57,7 @@ void fillToolPath(computational_geometry::ToolPath& tool_path, int step_coord_ch
     }
 
     step = std::clamp(static_cast<int>(step_distribution(step_generator)), 1, n_points / 3);
-    // std::cout << "step = " << step << std::endl;
+    //std::cout << "i = " << i << ", step = " << step << std::endl;
     i += step;
   }
 
@@ -321,8 +322,8 @@ int main (const int argc, char **const argv)
   int n_points_short = n_points_total / 3;
   std::cout << "Re-creating 2 ToolPath objects of 1/3 size..." << std::endl;
   start = std::chrono::steady_clock::now();
-  tool_path = computational_geometry::ToolPath(n_points_short);
-  fillToolPath(tool_path, step_coord_change_avg, vector_data_size, 
+  computational_geometry::ToolPath tool_path_main(n_points_short);
+  fillToolPath(tool_path_main, step_coord_change_avg, vector_data_size, 
                nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
   computational_geometry::ToolPath tool_path2(n_points_short);
   fillToolPath(tool_path2, step_coord_change_avg, vector_data_size, 
@@ -332,18 +333,36 @@ int main (const int argc, char **const argv)
   std::cout << "2 ToolPath objects created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
+  // 7. Making a copy of tool_path2 - we'll need it later for insertion test.
+  std::cout << "Making a copy of the second ToolPath..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  computational_geometry::ToolPath tool_path3(tool_path2);
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Copy of ToolPath created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
+
+  // 8. Appending tool_path2 to the end of tool_path
   std::cout << "Appending second ToolPath objects to the end of the first one..." << std::endl;
   start = std::chrono::steady_clock::now();
-  tool_path.append(tool_path2);
+  tool_path_main.append(tool_path2);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
   std::cout << "Addition done, combined ToolPath size = " << tool_path.numPoints() 
             << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
   
-  // 7. TODO: Insert second path one more time, but into the middle of combined path.
+  // 9. Insert tool_path3 into the middle of combined path.
+  std::cout << "Insertion of copy of second ToolPath object into the middle of combined ToolPath..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  tool_path_main.insert(n_points_short, tool_path3);
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Insertion done, combined ToolPath size = " << tool_path.numPoints() 
+            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
 
-  // 8. TODO: Create 1000 paths with 1000 points each and insert them randomly into combined path.
+  // 9. TODO: Create 1000 paths with 1000 points each and insert them randomly into combined path.
 
   return 0;
 }

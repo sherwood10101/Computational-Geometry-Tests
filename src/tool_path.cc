@@ -26,6 +26,15 @@ void ToolPathPoint::setDataIndex(int data_index) {
   m_data->setDataIndex(data_index);
 }
 
+ToolPath::ToolPath(const ToolPath& other_tool_path) : m_path(other_tool_path.m_path),
+                                                      m_current_position_set(false),
+                                                      m_point_indices_valid(false),
+                                                      m_locations(other_tool_path.m_locations),
+                                                      m_comments(other_tool_path.m_comments),
+                                                      m_data(other_tool_path.m_data) {
+  updatePointIndices();
+}
+
 ToolPath::ToolPath(int n_points) : m_path(n_points), m_point_indices_map(n_points, nullptr) {
   int point_counter = 0;
   for (auto& path_point : m_path){
@@ -325,6 +334,7 @@ void ToolPath::append(ToolPath& other_path) {
   }
 
   // 5. Append path points.
+  m_current_position_set = false;
   m_path.insert(m_path.end(), other_path.m_path.begin(), other_path.m_path.end());
 
   // 6. Resize m_data to actual capacity to optimize memory.
@@ -334,6 +344,10 @@ void ToolPath::append(ToolPath& other_path) {
   // 7. Update point indices.
   m_point_indices_valid = false;
   updatePointIndices();
+}
+
+void ToolPath::insert(int point_index, ToolPath& other_path) {
+  // TODO : implement this function.
 }
 
 void ToolPath::clear() {
