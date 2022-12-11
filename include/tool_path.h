@@ -118,6 +118,9 @@ class ToolPath {
     /// @brief utility to append other_path to the end of the given one.
     /// @note: This procedure invalidates content of the other_path.
     void append(ToolPath& other_path);
+
+    /// @brief utility to clear all the data in ToolPath.
+    void clear();
   
   private:
     /// @brief Actual path - sequence of points.

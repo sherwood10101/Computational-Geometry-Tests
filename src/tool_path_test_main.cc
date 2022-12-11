@@ -314,6 +314,9 @@ int main (const int argc, char **const argv)
   testRandomSinglePointInsertion(tool_path, percentage_of_points_to_insert, 
                                  nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
 
+  // Clear contents of the existing tool_path - we don't need it anymore.
+  tool_path.clear();
+
   // 6. Create 2 paths of the 1/3 size and add one path to the end of another.
   int n_points_short = n_points_total / 3;
   std::cout << "Re-creating 2 ToolPath objects of 1/3 size..." << std::endl;

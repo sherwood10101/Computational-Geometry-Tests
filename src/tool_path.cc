@@ -306,13 +306,26 @@ void ToolPath::append(ToolPath& other_path) {
     }
   }
 
-  // 4. TODO: Update comments.
+  // 4. Update comments.
   std::set<std::string> other_comments = other_path.m_comments;
   for(const auto other_comment : other_comments) {
     m_comments.insert(other_comment);
   }
+  for(auto& path_point : other_path.m_path) {
+    if (path_point.m_data) {
+      int comment_index_orig = path_point.m_data->getCommentIndex();
+      if (comment_index_orig >= 0) {
+        const std::string comment_str = *std::next(other_comments.begin(), comment_index_orig);
+        auto iter = m_comments.find(comment_str);
+        assert(iter != m_comments.end());
+        int comment_index_new = std::distance(m_comments.begin(), iter);
+        path_point.m_data->setCommentIndex(comment_index_new);
+      }
+    }
+  }
 
-  // 5. TODO : Append path points.
+  // 5. Append path points.
+  m_path.insert(m_path.end(), other_path.m_path.begin(), other_path.m_path.end());
 
   // 6. Resize m_data to actual capacity to optimize memory.
   m_data.shrink_to_fit();
@@ -321,6 +334,18 @@ void ToolPath::append(ToolPath& other_path) {
   // 7. Update point indices.
   m_point_indices_valid = false;
   updatePointIndices();
+}
+
+void ToolPath::clear() {
+  m_path.clear();
+  m_current_position_set = false;
+  m_point_indices_map.clear();
+  m_point_indices_valid = true;
+  m_locations.clear();
+  m_locations.shrink_to_fit();
+  m_comments.clear();
+  m_data.clear();
+  m_data.shrink_to_fit();
 }
   
 } // namespace computational_geometry
