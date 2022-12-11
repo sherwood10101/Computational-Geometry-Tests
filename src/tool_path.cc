@@ -344,10 +344,73 @@ void ToolPath::append(ToolPath& other_path) {
   // 7. Update point indices.
   m_point_indices_valid = false;
   updatePointIndices();
+  
+  // 8. Clear other_path for memory efficiency.
+  other_path.clear();
 }
 
 void ToolPath::insert(int point_index, ToolPath& other_path) {
-  // TODO : implement this function.
+  assert(point_index >= 0);
+  assert(point_index < numPoints());
+  
+  // 1. Make sure paths have consistent data.
+  updatePointIndices();
+  other_path.updatePointIndices();
+  int n_points_orig =  numPoints();
+  int n_locations_orig =  m_locations.size();
+  int n_data_orig =  m_data.size();
+
+  // 2. Update locations.
+  m_locations.insert(m_locations.end(), other_path.m_locations.begin(), other_path.m_locations.end());
+  for(auto& path_point : other_path.m_path) {
+    path_point.setLocationIndex(path_point.getLocationIndex() + n_locations_orig);
+  }
+
+  // 3. Update data.
+  m_data.insert(m_data.end(), other_path.m_data.begin(), other_path.m_data.end());
+  for(auto& path_point : other_path.m_path) {
+    if (path_point.m_data) {
+      int data_index_orig = path_point.m_data->getDataIndex();
+      if (data_index_orig >= 0) {
+        path_point.m_data->setDataIndex(data_index_orig + n_data_orig);
+      }
+    }
+  }
+
+  // 4. Update comments.
+  std::set<std::string> other_comments = other_path.m_comments;
+  for(const auto other_comment : other_comments) {
+    m_comments.insert(other_comment);
+  }
+  for(auto& path_point : other_path.m_path) {
+    if (path_point.m_data) {
+      int comment_index_orig = path_point.m_data->getCommentIndex();
+      if (comment_index_orig >= 0) {
+        const std::string comment_str = *std::next(other_comments.begin(), comment_index_orig);
+        auto iter = m_comments.find(comment_str);
+        assert(iter != m_comments.end());
+        int comment_index_new = std::distance(m_comments.begin(), iter);
+        path_point.m_data->setCommentIndex(comment_index_new);
+      }
+    }
+  }
+
+  // 5. Insert path points.
+  m_current_position_set = false;
+  auto iter = m_path.begin();
+  std::advance(iter, point_index);
+  m_path.insert(iter, other_path.m_path.begin(), other_path.m_path.end());
+
+  // 6. Resize m_data to actual capacity to optimize memory.
+  m_data.shrink_to_fit();
+  m_locations.shrink_to_fit();
+
+  // 7. Update point indices.
+  m_point_indices_valid = false;
+  updatePointIndices();
+
+  // 8. Clear other_path for memory efficiency.
+  other_path.clear();
 }
 
 void ToolPath::clear() {

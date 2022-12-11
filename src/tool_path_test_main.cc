@@ -348,7 +348,7 @@ int main (const int argc, char **const argv)
   tool_path_main.append(tool_path2);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Addition done, combined ToolPath size = " << tool_path.numPoints() 
+  std::cout << "Addition done, combined ToolPath size = " << tool_path_main.numPoints() 
             << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
   
@@ -358,7 +358,7 @@ int main (const int argc, char **const argv)
   tool_path_main.insert(n_points_short, tool_path3);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Insertion done, combined ToolPath size = " << tool_path.numPoints() 
+  std::cout << "Insertion done, combined ToolPath size = " << tool_path_main.numPoints() 
             << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
