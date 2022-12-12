@@ -61,34 +61,38 @@ void fillToolPath(computational_geometry::ToolPath& tool_path, int step_coord_ch
     i += step;
   }
 
-  // Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
-  std::string comment_str(100, 'x');
-  int step_comment_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_string_data), 1, n_points / 2);
-  //std::cout << "step_comment_avg = " << step_comment_avg << std::endl;
-  std::default_random_engine comment_step_generator;
-  double comment_sigma = std::clamp(step_comment_avg / 2., 5., n_points / 10.);
-  std::normal_distribution<double> step_comment_distribution(static_cast<double>(step_comment_avg), comment_sigma);
-  for(int i = 0; i < n_points;) {
-    tool_path.setComment(i, comment_str);
-    step = std::clamp(static_cast<int>(step_comment_distribution(comment_step_generator)), 1, n_points / 3);
-    //std::cout << "step = " << step << std::endl;
-    i += step;
+  if (nodes_percentage_with_string_data > std::numeric_limits<double>::epsilon()) {
+    // Randomly upgrade nodes_percentage_with_string_data % of the points to hold a 100 character string.
+    std::string comment_str(100, 'x');
+    int step_comment_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_string_data), 1, n_points / 2);
+    //std::cout << "step_comment_avg = " << step_comment_avg << std::endl;
+    std::default_random_engine comment_step_generator;
+    double comment_sigma = std::clamp(step_comment_avg / 2., 5., n_points / 10.);
+    std::normal_distribution<double> step_comment_distribution(static_cast<double>(step_comment_avg), comment_sigma);
+    for(int i = 0; i < n_points;) {
+      tool_path.setComment(i, comment_str);
+      step = std::clamp(static_cast<int>(step_comment_distribution(comment_step_generator)), 1, n_points / 3);
+      //std::cout << "step = " << step << std::endl;
+      i += step;
+    }
   }
 
-  // Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats.
-  std::vector<float> data_1d(vector_data_size, 1.); // All 1s.
-  std::vector<std::vector<float>> data_2d(vector_data_size, data_1d);
-  computational_geometry::Data3D data_3d(vector_data_size, data_2d);
-  int step_data_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_3d_vector), 1, n_points / 2);
-  //std::cout << "step_data_avg = " << step_data_avg << std::endl;
-  std::default_random_engine data_step_generator;
-  double data_sigma = std::clamp(step_data_avg / 2., 5., n_points / 10.);
-  std::normal_distribution<double> step_data_distribution(static_cast<double>(step_data_avg), data_sigma);
-  for(int i = 0; i < n_points;) {
-    tool_path.setData(i, data_3d);
-    step = std::clamp(static_cast<int>(step_data_distribution(data_step_generator)), 1, n_points / 3);
-    //std::cout << "step = " << step << std::endl;
-    i += step;
+  if (nodes_percentage_with_3d_vector > std::numeric_limits<double>::epsilon()) {
+    // Randomly upgrade nodes_percentage_with_3d_vector % of the points to also hold a 3D array of floats.
+    std::vector<float> data_1d(vector_data_size, 1.); // All 1s.
+    std::vector<std::vector<float>> data_2d(vector_data_size, data_1d);
+    computational_geometry::Data3D data_3d(vector_data_size, data_2d);
+    int step_data_avg = std::clamp(static_cast<int>(100. / nodes_percentage_with_3d_vector), 1, n_points / 2);
+    //std::cout << "step_data_avg = " << step_data_avg << std::endl;
+    std::default_random_engine data_step_generator;
+    double data_sigma = std::clamp(step_data_avg / 2., 5., n_points / 10.);
+    std::normal_distribution<double> step_data_distribution(static_cast<double>(step_data_avg), data_sigma);
+    for(int i = 0; i < n_points;) {
+      tool_path.setData(i, data_3d);
+      step = std::clamp(static_cast<int>(step_data_distribution(data_step_generator)), 1, n_points / 3);
+      //std::cout << "step = " << step << std::endl;
+      i += step;
+    }
   }
 
   // Finalize locations initialization (update location for last chunk of path points) + optimize Data3D memory.
@@ -318,7 +322,7 @@ int main (const int argc, char **const argv)
   // Clear contents of the existing tool_path - we don't need it anymore.
   tool_path.clear();
 
-  // 6. Create 2 paths of the 1/3 size and add one path to the end of another.
+  // 6. Create 2 paths of the 1/3 size.
   int n_points_short = n_points_total / 3;
   std::cout << "Re-creating 2 ToolPath objects of 1/3 size..." << std::endl;
   start = std::chrono::steady_clock::now();
@@ -342,7 +346,7 @@ int main (const int argc, char **const argv)
   std::cout << "Copy of ToolPath created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
-  // 8. Appending tool_path2 to the end of tool_path
+  // 8. Appending tool_path2 to the end of tool_path.
   std::cout << "Appending second ToolPath objects to the end of the first one..." << std::endl;
   start = std::chrono::steady_clock::now();
   tool_path_main.append(tool_path2);
@@ -362,7 +366,33 @@ int main (const int argc, char **const argv)
             << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
-  // 9. TODO: Create 1000 paths with 1000 points each and insert them randomly into combined path.
+  // Clear contents of the existing tool_path_main - we don't need it anymore.
+  tool_path_main.clear();
 
+  // 9. Create 1000 paths with 100000 points each and concatenating them into combined path.
+  int n_sub_paths = 1000;
+  int n_points_sub_path = 100000;
+  std::cout << "Creation of " << n_sub_paths << " ToolPaths of " << n_points_sub_path 
+            << " size each and concatenate them into combined ToolPath..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  computational_geometry::ToolPath tool_path_combined(n_points_sub_path);
+  fillToolPath(tool_path_combined, step_coord_change_avg, vector_data_size, 
+               nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+  for (int i = 0; i < n_sub_paths - 1; i++) {
+    int percentage = (100 * i) / n_sub_paths;
+    if (i % (n_sub_paths / 10) == 0) {
+      std::cout << percentage << "% done" << std::endl;
+    }
+    computational_geometry::ToolPath sub_path(n_points_sub_path);
+    fillToolPath(sub_path, step_coord_change_avg, vector_data_size, 
+                 nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+    tool_path_combined.append(sub_path);
+  }
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Concatenation done, combined ToolPath size = " << tool_path_combined.numPoints() 
+            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
+  
   return 0;
 }

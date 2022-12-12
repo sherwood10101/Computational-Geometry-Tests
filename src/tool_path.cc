@@ -344,7 +344,7 @@ void ToolPath::append(ToolPath& other_path) {
   // 7. Update point indices.
   m_point_indices_valid = false;
   updatePointIndices();
-  
+
   // 8. Clear other_path for memory efficiency.
   other_path.clear();
 }
