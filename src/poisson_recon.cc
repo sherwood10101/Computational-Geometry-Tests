@@ -717,26 +717,38 @@ int Execute( int argc , char* argv[] )
 
 namespace computational_geometry {
 
+/*
+void testArgvCreator(int& argctest, char** argvtest, std::vector<std::string>& arguments)
+{	
+	for (const auto& arg : arguments)
+        argvtest.push_back((char*)arg.data());
+    argvtest.push_back(nullptr);
+	argctest = arguments.size();
+}
+*/
+
 /*! Create command line argc and argv from input parameters
  *  So that you can use Poisson mesh reconstruction functions that require command line input
  */
 
 /*
-void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params)
+void makeCommandLineFromParams(int& argc, char** argv, const PoissonParams& paramsTest)
 {
     argc = 2 * 50 + 1; // 2 * number of params plus 1
 	char* argStrs[argc];
     
-	std::string tempStr = params.programName;
+	std::string tempStr = paramsTest.programName;
 	argStrs[0] = tempStr.c_str;
 	//argStrs.push_back(tempStr.c_str);
 	
-	//argStrs.push_back((params.programName).c_str);
+	//argStrs.push_back((paramsTest.programName).c_str);
 
     argv = argStrs;
 	std::assert(argv.length() == argc);
 }
+*/
 
+/*
 // PoissonMeshReconstructor class implementation
 void PoissonMeshReconstructor::Run() 
 {
@@ -784,23 +796,25 @@ void PoissonMeshReconstructor::Run()
 }
 */
 
-// old version
+// temp test passing synthetic argc and argv
 // PoissonMeshReconstructor class implementation
 void PoissonMeshReconstructor::Run() 
 {
 	std::cout << "Running PoissonRecon..." << std::endl;
 	
-	//int argc = 5;
-	//char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
-	//const_cast<char*>(m_output_ply_file.c_str()) };
 
 	std::string tmp = std::to_string(m_depth);
 	char const *depth_char = tmp.c_str();
 
-	int argc = 7;
-	char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
-	const_cast<char*>(m_output_ply_file.c_str()),
-	const_cast<char*>(depth_char), "--depth" };
+
+	int argc = m_argc;
+	char** argv = m_argv;
+	//char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()),
+	//                 "--out", const_cast<char*>(m_output_ply_file.c_str()),
+	//                 "--depth", const_cast<char*>(depth_char) };
+
+	std::cout << "m_paramsTest.depth = " << m_paramsTest.depth << "  press enter to continue" << std::endl;
+	std::cin.get();
 
 	double t = Time();
 	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
@@ -823,5 +837,53 @@ void PoissonMeshReconstructor::Run()
 	}
 }
 
+
+
+
+
+// old version (works but doesn't let you specify all the parameters)
+// PoissonMeshReconstructor class implementation
+/*
+void PoissonMeshReconstructor::Run() 
+{
+	std::cout << "Running PoissonRecon..." << std::endl;
+	
+	//int argc = 5;
+	//char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()), "--out", 
+	//const_cast<char*>(m_output_ply_file.c_str()) };
+
+	std::string tmp = std::to_string(m_depth);
+	char const *depth_char = tmp.c_str();
+
+
+	int argc = 7;
+	char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()),
+	                 "--out", const_cast<char*>(m_output_ply_file.c_str()),
+	                 "--depth", const_cast<char*>(depth_char) };
+
+	std::cout << "m_paramsTest.depth = " << m_paramsTest.depth << "  press enter to continue" << std::endl;
+	std::cin.get();
+
+	double t = Time();
+	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+
+	{
+		if( Density.set )
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorAndValueVertex< float > >( argc , argv );
+				else             Execute< float  , PlyColorAndValueVertex< float > >( argc , argv );
+			else
+				if( Double.set ) Execute< double , PlyValueVertex< float > >( argc , argv );
+				else             Execute< float  , PlyValueVertex< float > >( argc , argv );
+		else
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorVertex< float > >( argc , argv );
+				else             Execute< float  , PlyColorVertex< float > >( argc , argv );
+			else
+				if( Double.set ) Execute< double , PlyVertex< float > >( argc , argv );
+				else             Execute< float  , PlyVertex< float > >( argc , argv );
+	}
+}
+*/
 
 } // namespace computational_geometry

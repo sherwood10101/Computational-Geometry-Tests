@@ -1,10 +1,11 @@
 #pragma once
 
+#include <vector>
 #include <string>
 
 namespace computational_geometry {
 
-/*
+
 struct PoissonParams
 {
     std::string programName; // added - becomes argv[0]
@@ -59,16 +60,16 @@ struct PoissonParams
     std::string threadPoolParallelType = "THREAD_Pool"; // added
 };
 
+//void testArgvCreator(int argctest, char** argvtest, std::vector<std::string>& arguments);
 
 /*! Create command line argc and argv from input parameters
  *  So that you can use Poisson mesh reconstruction functions that require command line input
  */
-
-// void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params);
+//void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params);
 
 
 /// Top-level class to perform Poisson mesh reconstruction of point cloud with vertex normals
-
+// this wone doesn't work yet - need to fix to use PoissonParams struct
 /*
 class PoissonMeshReconstructor {
   public:
@@ -84,23 +85,53 @@ class PoissonMeshReconstructor {
 };
 */
 
-//  Old version for reference
 class PoissonMeshReconstructor {
   public:
-    PoissonMeshReconstructor(const std::string& input_points_file, 
+    PoissonMeshReconstructor(const PoissonParams& paramsTest,
+                             const std::string& input_points_file, 
                              const std::string& output_ply_file,
-                             const int depth) : m_input_file(input_points_file),
-                                                                   m_output_ply_file(output_ply_file),
-                                                                   m_depth(depth) {}
+                             const int depth,
+                             const int argc,
+                             char** argv) : m_paramsTest(paramsTest),
+                                                m_input_file(input_points_file),
+                                                m_output_ply_file(output_ply_file),
+                                                m_depth(depth),
+                                                m_argc(argc), 
+                                                m_argv(argv) {}
 
     /// Top-level routine to run mesh reconstruction and write out PLY file.
     void Run();
   
   private:
+     PoissonParams m_paramsTest;
+     std::string m_input_file;
+     std::string m_output_ply_file;
+     int m_depth;
+     int m_argc;
+     char** m_argv;
+};
+
+//  Old version for reference (works but doesn't let you specify all the parameters)
+/*
+class PoissonMeshReconstructor {
+  public:
+    PoissonMeshReconstructor(const PoissonParams& paramsTest,
+                             const std::string& input_points_file, 
+                             const std::string& output_ply_file,
+                             const int depth) : m_paramsTest(paramsTest),
+                                                m_input_file(input_points_file),
+                                                m_output_ply_file(output_ply_file),
+                                                m_depth(depth) {}
+
+    /// Top-level routine to run mesh reconstruction and write out PLY file.
+    void Run();
+  
+  private:
+     PoissonParams m_paramsTest;
      std::string m_input_file;
      std::string m_output_ply_file;
      int m_depth;
 };
-
+*/
   
 } // namespace computational_geometry

@@ -45,6 +45,9 @@ void writePointsFile(const std::string& points_file, computational_geometry::Mes
 
 int main (const int argc, char **const argv) 
 {
+  std::cout << "MODS 2.  Press enter to continue..." << std::endl;
+  std::cin.get();
+
   if (argc != 3) {
     std::cout << "Incorrect usage, must be: computational_geometry_template <input_mesh_file> <poisson_reconstructed_ply_file>" << std::endl;
     return -1;
@@ -69,17 +72,51 @@ int main (const int argc, char **const argv)
 
   std::string points_file("points.txt");
   writePointsFile(points_file, mesh_loader.getMesh());
-  int depth = 3;
+  int depth = 5;
 
-  /*computational_geometry::PoissonParams params;
-  params.programName = "computational_geometry_template_main.cc";
-  params.inputFilename = points_file;
-  params.outputFilename = argv[2];
-  params.depth = 12;
-  */
+  computational_geometry::PoissonParams paramsTest;
+  paramsTest.programName = "computational_geometry_template_main.cc";
+  paramsTest.inputFilename = points_file;
+  paramsTest.outputFilename = argv[2];
+  paramsTest.depth = 6;
+  
+  // test creating synthetic argc and argv
+  //std::vector<std::string> arguments = {"--dir", "/some_path"}; // worked
 
-  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(params);
-  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file, depth);
+  std::string tmp = std::to_string(paramsTest.depth);
+	char const *depth_char = tmp.c_str();
+  std::vector<std::string> arguments = { "PoissonRecon", "--in", const_cast<char*>(paramsTest.inputFilename.c_str()),
+	                 "--out", const_cast<char*>( paramsTest.outputFilename.c_str()),
+	                 "--depth", const_cast<char*>(depth_char) };
+  int argctest = 0;
+  //char** argvtest;
+  //computational_geometry::testArgvCreator(argctest, argvtest, arguments);
+
+  std::vector<char*> argvtest;
+  for (const auto& arg : arguments)
+      argvtest.push_back((char*)arg.data());
+  argvtest.push_back(nullptr);
+  argctest = argvtest.size() - 1;
+  //f.bar(argv.size() - 1, argv.data());
+
+  //char* argvSynthetic[(argvtest.size() - 1)] = argvtest.data();
+  char** argv2 = argvtest.data();
+
+  std::cout << "number of arguments: " << argctest << std::endl;
+  std::cout << "printing synthetic argvtest: " << std::endl;
+  for (int i = 0; i < argctest-1; i++)
+    std::cout << argvtest[i] << std::endl;
+  std::cout << "press enter to continue" << std::endl;
+  std::cin.get();
+
+    std::cout << "printing synthetic argv2: " << std::endl;
+  for (int i = 0; i < argctest-1; i++)
+    std::cout << argv2[i] << std::endl;
+  std::cout << "press enter to continue" << std::endl;
+  std::cin.get();
+
+  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest);
+  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest, points_file, output_ply_file, depth, argctest, argv2);
 
   mesh_reconstructor.Run();
   if (fs::exists(points_file)) {
