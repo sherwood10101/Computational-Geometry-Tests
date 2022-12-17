@@ -5,85 +5,101 @@
 
 namespace computational_geometry {
 
+/*
+possible options are:
+  degree
+  double
+  bType
+  in
+  depth
+  out
+  xForm
+  scale
+  verbose
+  cgAccuracy
+  noComments
+  iterMultiplier
+  kernelDepth
+  samplesPerNode
+  confidence
+  nWeights
+  nonManifold
+  polygonMesh
+  ascii
+  showResidual
+  voxelDepth
+  pointWeight
+  voxel
+  threads
+  maxSolveDepth
+  adaptiveExp
+  density
+  fullDepth
+  cgDepth
+  iters
+  color
+  linearFit
+  primalVoxel
+  tempDir
+*/
 
+// missing: iterMultiplier
 struct PoissonParams
 {
     std::string programName; // added - becomes argv[0]
-    std::string inputFilename; //
-    std::string outputFilename; //
-    std::string tempDir; //
-    std::string voxelGridFilename; //
+    std::string inputFilename; // option is "in"
+    std::string outputFilename; // option is "out"
+    std::string tempDir; // option is "tempDir"
+    std::string voxelGridFilename; // option is "voxel" ??
     std::string treeFilename; // not in poisson_recon.cc?
-    std::string xformFilename; //
-    bool performance = false; // not in poisson_recon.cc?
-    bool showResidual = false; //
-    bool noComments = false; //
-    bool polygonMesh = false; //
-    bool normalWeights = false; // added. is this bool?
-    bool nonManifold = false; //
-    bool ascii = false; //
-    bool density = false; //
-    bool linearFit = false; //
-    bool primalVoxel = false; //
-    bool useDouble = false; // added. is this bool?
-    bool exactInterpolation = false;
-    bool normals = false;
-    bool colors = false;
-    bool inCore = false;
-    bool verbose = false; //
-    int degree = 1; //
-    int depth = 8; //
-    int cgDepth = 0; // added
-    int kernelDepth = 0; //
-    int adaptiveExponent = 1; // added
-    int iters = 8; //
-    int voxelDepth = -1; // added
-    int fullDepth = 5; //
+    std::string xformFilename; // option is "xForm"
+    //bool performance = false; // not in poisson_recon.cc?
+    bool showResidual = false; // option is "show Residual"
+    bool noComments = false; // option is "noComments"
+    bool polygonMesh = false; // option is "polygonMesh"
+    bool normalWeights = false; // option is "nWeights"; is this bool?
+    bool nonManifold = false; //option is "nonManifold"
+    bool ascii = false; // option is "ascii"
+    bool density = false; // option is "density" - is this bool?
+    bool linearFit = false; // option is "linearFit"
+    bool primalVoxel = false; // option is "primavoxel"
+    bool useDouble = false; // option is "double"
+    //bool exactInterpolation = false;
+    //bool normals = false;
+    //bool colors = false;  // ?
+    //bool inCore = false;
+    bool verbose = false; // option is "verbose"
+    int degree = 1; // option is "degree"
+    int depth = 8; // option is "depth"
+    int cgDepth = 0; // option is "cgDepth"
+    int kernelDepth = 0; // option is "kernelDepth"
+    int adaptiveExponent = 1; // option is "adaptiveExp"
+    int iters = 8; // option is "iters"
+    int voxelDepth = -1; // option is "voxelDepth"
+    int fullDepth = 5; // option is "fullDepth"
     int baseDepth = 0; // not in poisson_recon.cc?
     int baseVCycles = 1; // not in poisson_recon.cc?
     int maxMemoryGB = 0; // not in poisson_recon.cc?
     int threadChunkSize = 128; // not in poisson_recon.cc?
-    int maxSolveDepth = 16; // added.  Is this right?
-    int threads = 0; //
-    float dataX = 32.0f;
-    float samplesPerNode = 1.5f;
-    float scale = 1.1f; //
-    float width = 0.0f;
-    float confidence = 0.0f; //
-    float confidenceBias = 0.0f;
-    float cgSolverAccuracy = 1.0e-3f; //
-    float lowResIterMultiplier = 1.f; // added
-    float pointWeight = 4.0f; //
-    float color = 16.f; // added
-    std::string bType = "BOUNDARY_NEUMANN+1"; // added
-    std::string threadPoolScheduleType = "Dynamic"; // added
-    std::string threadPoolParallelType = "THREAD_Pool"; // added
+    int maxSolveDepth = 16; // option is "maxSolveDepth" - not sure default is right
+    int threads = 0; // option is "threads"
+    //float dataX = 32.0f;
+    float samplesPerNode = 1.5f; // option is "scamplesPerNode"
+    float scale = 1.1f; // option is "scale"
+    //float width = 0.0f;
+    float confidence = 0.0f; // option is "confidence"
+    //float confidenceBias = 0.0f;
+    float cgSolverAccuracy = 1.0e-3f; // option is "cgAccuracy"
+    //float lowResIterMultiplier = 1.f; // added
+    float pointWeight = 4.0f; // option is "pointWeight"
+    float color = 16.f; // option is "color"
+    std::string bType = "BOUNDARY_NEUMANN+1"; // option is "bType"
+    //std::string threadPoolScheduleType = "Dynamic"; // added
+    //std::string threadPoolParallelType = "THREAD_Pool"; // added
 };
 
-//void testArgvCreator(int argctest, char** argvtest, std::vector<std::string>& arguments);
-
-/*! Create command line argc and argv from input parameters
- *  So that you can use Poisson mesh reconstruction functions that require command line input
- */
-//void makeCommandLineFromParams(int& argc, char* argv[], const PoissonParams& params);
 
 
-/// Top-level class to perform Poisson mesh reconstruction of point cloud with vertex normals
-// this wone doesn't work yet - need to fix to use PoissonParams struct
-/*
-class PoissonMeshReconstructor {
-  public:
-    PoissonMeshReconstructor(const PoissonParams& params) : 
-                             m_params(params) {}
-    
-    /// Top-level routine to run mesh reconstruction and write out PLY file.
-    void Run();
-
-    private:
-      PoissonParams m_params;
-
-};
-*/
 
 class PoissonMeshReconstructor {
   public:

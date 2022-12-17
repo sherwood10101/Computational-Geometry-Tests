@@ -79,38 +79,97 @@ int main (const int argc, char **const argv)
   paramsTest.inputFilename = points_file;
   paramsTest.outputFilename = argv[2];
   paramsTest.depth = 6;
+  paramsTest.useDouble = false;
+  paramsTest.verbose = true;
+
+  paramsTest.bType = "BOUNDARY_NEUMANN+1"; 
+
   
   // test creating synthetic argc and argv
-  //std::vector<std::string> arguments = {"--dir", "/some_path"}; // worked
-
   std::string tmp = std::to_string(paramsTest.depth);
 	char const *depth_char = tmp.c_str();
+
+/*
+std::string programName; // added - becomes argv[0]
+    std::string inputFilename; // option is "in"
+    std::string outputFilename; // option is "out"
+    std::string tempDir; // option is "tempDir"
+    std::string voxelGridFilename; // option is "voxel" ??
+    std::string treeFilename; // not in poisson_recon.cc?
+    std::string xformFilename; // option is "xForm"
+    //bool performance = false; // not in poisson_recon.cc?
+    bool showResidual = false; //
+    bool noComments = false; // option is "noComments"
+    bool polygonMesh = false; // option is "polygonMesh"
+    bool normalWeights = false; // option is "nWeights"; is this bool?
+    bool nonManifold = false; //option is "nonManifold"
+    bool ascii = false; // option is "ascii"
+    bool showResidual = false; // option is "showResidual"
+    bool density = false; // option is "density" - is this bool?
+    bool linearFit = false; // option is "linearFit"
+    bool primalVoxel = false; // option is "primavoxel"
+    bool useDouble = false; // option is "double"
+    bool verbose = false; // option is "verbose"
+    int degree = 1; // option is "degree"
+    int depth = 8; // option is "depth"
+    int cgDepth = 0; // option is "cgDepth"
+    int kernelDepth = 0; // option is "kernelDepth"
+    int adaptiveExponent = 1; // option is "adaptiveExp"
+    int iters = 8; // option is "iters"
+    int voxelDepth = -1; // option is "voxelDepth"
+    int fullDepth = 5; // option is "fullDepth"
+    int baseDepth = 0; // not in poisson_recon.cc?
+    int baseVCycles = 1; // not in poisson_recon.cc?
+    int maxMemoryGB = 0; // not in poisson_recon.cc?
+    int threadChunkSize = 128; // not in poisson_recon.cc?
+    int maxSolveDepth = 16; // option is "maxSolveDepth" - not sure default is right
+    int threads = 0; // option is "threads"
+    //float dataX = 32.0f;
+    float samplesPerNode = 1.5f; // option is "scamplesPerNode"
+    float scale = 1.1f; // option is "scale"
+    //float width = 0.0f;
+    float confidence = 0.0f; // option is "confidence"
+    //float confidenceBias = 0.0f;
+    float cgSolverAccuracy = 1.0e-3f; // option is "cgAccuracy"
+    //float lowResIterMultiplier = 1.f; // added
+    float pointWeight = 4.0f; // option is "pointWeight"
+    float color = 16.f; // option is "color"
+    std::string bType = "BOUNDARY_NEUMANN+1"; // option is "bType"
+    //std::string threadPoolScheduleType = "Dynamic"; // added
+    //std::string threadPoolParallelType = "THREAD_Pool"; // added
+*/
   std::vector<std::string> arguments = { "PoissonRecon", "--in", const_cast<char*>(paramsTest.inputFilename.c_str()),
 	                 "--out", const_cast<char*>( paramsTest.outputFilename.c_str()),
-	                 "--depth", const_cast<char*>(depth_char) };
-  int argctest = 0;
-  //char** argvtest;
-  //computational_geometry::testArgvCreator(argctest, argvtest, arguments);
+	                 "--depth", const_cast<char*>(depth_char)};
 
+  if(paramsTest.useDouble) 
+      arguments.push_back("--double");
+  arguments.push_back("--bType");
+  arguments.push_back("1");
+  arguments.push_back("--iters");
+  arguments.push_back("10");
+  //arguments.push_back(paramsTest.bType);
+  if(paramsTest.verbose)
+      arguments.push_back("--verbose");
+
+
+  int argctest = 0;
   std::vector<char*> argvtest;
+
+
+  // function call doesn't preserve the data in argvtest;  it is empty
+  //computational_geometry::testargs(argctest, argvtest, arguments);
+
   for (const auto& arg : arguments)
       argvtest.push_back((char*)arg.data());
   argvtest.push_back(nullptr);
   argctest = argvtest.size() - 1;
-  //f.bar(argv.size() - 1, argv.data());
 
-  //char* argvSynthetic[(argvtest.size() - 1)] = argvtest.data();
   char** argv2 = argvtest.data();
 
   std::cout << "number of arguments: " << argctest << std::endl;
-  std::cout << "printing synthetic argvtest: " << std::endl;
-  for (int i = 0; i < argctest-1; i++)
-    std::cout << argvtest[i] << std::endl;
-  std::cout << "press enter to continue" << std::endl;
-  std::cin.get();
-
     std::cout << "printing synthetic argv2: " << std::endl;
-  for (int i = 0; i < argctest-1; i++)
+  for (int i = 0; i < argctest; i++)
     std::cout << argv2[i] << std::endl;
   std::cout << "press enter to continue" << std::endl;
   std::cin.get();

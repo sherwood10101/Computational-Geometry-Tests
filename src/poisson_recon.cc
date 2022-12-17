@@ -717,6 +717,8 @@ int Execute( int argc , char* argv[] )
 
 namespace computational_geometry {
 
+
+
 /*
 void testArgvCreator(int& argctest, char** argvtest, std::vector<std::string>& arguments)
 {	
