@@ -51,7 +51,6 @@ struct PoissonParams
     std::string outputFilename; // option is "out"
     std::string tempDir; // option is "tempDir"
     std::string voxelGridFilename; // option is "voxel" ??
-    std::string treeFilename; // not in poisson_recon.cc?
     std::string xformFilename; // option is "xForm"
     //bool performance = false; // not in poisson_recon.cc?
     bool showResidual = false; // option is "show Residual"
@@ -77,10 +76,10 @@ struct PoissonParams
     int iters = 8; // option is "iters"
     int voxelDepth = -1; // option is "voxelDepth"
     int fullDepth = 5; // option is "fullDepth"
-    int baseDepth = 0; // not in poisson_recon.cc?
-    int baseVCycles = 1; // not in poisson_recon.cc?
-    int maxMemoryGB = 0; // not in poisson_recon.cc?
-    int threadChunkSize = 128; // not in poisson_recon.cc?
+    //int baseDepth = 0; // not in poisson_recon.cc?
+    //int baseVCycles = 1; // not in poisson_recon.cc?
+    //int maxMemoryGB = 0; // not in poisson_recon.cc?
+    //int threadChunkSize = 128; // not in poisson_recon.cc?
     int maxSolveDepth = 16; // option is "maxSolveDepth" - not sure default is right
     int threads = 0; // option is "threads"
     //float dataX = 32.0f;
@@ -90,12 +89,12 @@ struct PoissonParams
     float confidence = 0.0f; // option is "confidence"
     //float confidenceBias = 0.0f;
     float cgSolverAccuracy = 1.0e-3f; // option is "cgAccuracy"
-    //float lowResIterMultiplier = 1.f; // added
+    //float lowResIterMultiplier = 1.f; // 
     float pointWeight = 4.0f; // option is "pointWeight"
     float color = 16.f; // option is "color"
-    std::string bType = "BOUNDARY_NEUMANN+1"; // option is "bType"
-    //std::string threadPoolScheduleType = "Dynamic"; // added
-    //std::string threadPoolParallelType = "THREAD_Pool"; // added
+    int bType = 1; // option is "bType";  I think this can be 0, 1, 2 for BOUNDARY_FREE, BOUNDARY_NEUMANN, BOUNDARY_DIRICHLET but not sure
+    //std::string threadPoolScheduleType = "Dynamic"; // 
+    //std::string threadPoolParallelType = "THREAD_Pool"; // 
 };
 
 
@@ -114,6 +113,23 @@ class PoissonMeshReconstructor {
                                                 m_depth(depth),
                                                 m_argc(argc), 
                                                 m_argv(argv) {}
+
+    // constructor that uses only the PoisonParams struct
+    PoissonMeshReconstructor(const PoissonParams& paramsTest) : m_paramsTest(paramsTest) 
+    {
+        m_input_file = m_paramsTest.inputFilename;
+        m_output_ply_file = m_paramsTest.outputFilename;
+        
+        // need to turn paramsTest into argv, argc here
+
+
+        std::string tmp = std::to_string(m_paramsTest.depth);
+	      char const *depth_char = tmp.c_str();
+
+        std::vector<std::string> arguments = { "PoissonRecon", "--in", const_cast<char*>(m_paramsTest.inputFilename.c_str()),
+	                 "--out", const_cast<char*>( m_paramsTest.outputFilename.c_str()),
+	                 "--depth", const_cast<char*>(depth_char)};
+    }                                                
 
     /// Top-level routine to run mesh reconstruction and write out PLY file.
     void Run();

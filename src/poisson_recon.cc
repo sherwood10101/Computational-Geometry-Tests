@@ -719,36 +719,7 @@ namespace computational_geometry {
 
 
 
-/*
-void testArgvCreator(int& argctest, char** argvtest, std::vector<std::string>& arguments)
-{	
-	for (const auto& arg : arguments)
-        argvtest.push_back((char*)arg.data());
-    argvtest.push_back(nullptr);
-	argctest = arguments.size();
-}
-*/
 
-/*! Create command line argc and argv from input parameters
- *  So that you can use Poisson mesh reconstruction functions that require command line input
- */
-
-/*
-void makeCommandLineFromParams(int& argc, char** argv, const PoissonParams& paramsTest)
-{
-    argc = 2 * 50 + 1; // 2 * number of params plus 1
-	char* argStrs[argc];
-    
-	std::string tempStr = paramsTest.programName;
-	argStrs[0] = tempStr.c_str;
-	//argStrs.push_back(tempStr.c_str);
-	
-	//argStrs.push_back((paramsTest.programName).c_str);
-
-    argv = argStrs;
-	std::assert(argv.length() == argc);
-}
-*/
 
 /*
 // PoissonMeshReconstructor class implementation
