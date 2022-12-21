@@ -776,18 +776,24 @@ void PoissonMeshReconstructor::Run()
 	std::cout << "Running PoissonRecon..." << std::endl;
 	
 
-	std::string tmp = std::to_string(m_depth);
-	char const *depth_char = tmp.c_str();
 
 
 	int argc = m_argc;
 	char** argv = m_argv;
-	//char* argv[] = { "PoissonRecon", "--in", const_cast<char*>(m_input_file.c_str()),
-	//                 "--out", const_cast<char*>(m_output_ply_file.c_str()),
-	//                 "--depth", const_cast<char*>(depth_char) };
 
-	std::cout << "m_paramsTest.depth = " << m_paramsTest.depth << "  press enter to continue" << std::endl;
-	std::cin.get();
+////////// debugging ////////////////
+
+        std::cout << "number of arguments: " << m_argc << std::endl;
+        std::cout << "printing  ### argv ### in run(): " << std::endl;
+        for (int i = 0; i < argc; i++)
+            std::cout << argv[i] << std::endl;
+        std::cout << "press enter to continue" << std::endl;
+        std::cin.get();
+
+/////////// end debugging ///////////
+
+
+
 
 	double t = Time();
 	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );

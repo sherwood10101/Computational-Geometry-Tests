@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace computational_geometry {
 
@@ -102,45 +103,130 @@ struct PoissonParams
 
 class PoissonMeshReconstructor {
   public:
-    PoissonMeshReconstructor(const PoissonParams& paramsTest,
-                             const std::string& input_points_file, 
+    PoissonMeshReconstructor(const std::string& input_points_file, 
                              const std::string& output_ply_file,
-                             const int depth,
+                             //const int depth,
                              const int argc,
-                             char** argv) : m_paramsTest(paramsTest),
-                                                m_input_file(input_points_file),
+                             char** argv) :     m_input_file(input_points_file),
                                                 m_output_ply_file(output_ply_file),
-                                                m_depth(depth),
+                                                //m_depth(depth),
                                                 m_argc(argc), 
-                                                m_argv(argv) {}
+                                                m_argv(argv) 
+      {
+        m_useSyntheticParams = false; // so later you can tell if it was command line or synthetic params
+      }
 
     // constructor that uses only the PoisonParams struct
-    PoissonMeshReconstructor(const PoissonParams& paramsTest) : m_paramsTest(paramsTest) 
+    PoissonMeshReconstructor(const PoissonParams& p_params) : m_inputparams(p_params) 
     {
-        m_input_file = m_paramsTest.inputFilename;
-        m_output_ply_file = m_paramsTest.outputFilename;
+        m_useSyntheticParams = true; // so later you can tell if it was command line or synthetic params
         
-        // need to turn paramsTest into argv, argc here
+        m_input_file = m_inputparams.inputFilename;
+        m_output_ply_file = m_inputparams.outputFilename;
+        
+        // turn paramsTest into argv, argc here
 
 
-        std::string tmp = std::to_string(m_paramsTest.depth);
-	      char const *depth_char = tmp.c_str();
 
-        std::vector<std::string> arguments = { "PoissonRecon", "--in", const_cast<char*>(m_paramsTest.inputFilename.c_str()),
-	                 "--out", const_cast<char*>( m_paramsTest.outputFilename.c_str()),
-	                 "--depth", const_cast<char*>(depth_char)};
+
+        std::vector<std::string> arguments = { "PoissonRecon", "--in", const_cast<char*>(m_inputparams.inputFilename.c_str()),
+	                 "--out", const_cast<char*>( m_inputparams.outputFilename.c_str())};
+	                 //"--depth", const_cast<char*>(depth_char)};
+
+
+/*
+  paramsTest.programName = "computational_geometry_template_main.cc";
+  paramsTest.inputFilename = points_file;
+  paramsTest.outputFilename = argv[2];
+  paramsTest.tempDir = "";
+  //paramsTest.tempDir = "tempdir";
+  paramsTest.voxelGridFilename = "voxelfile";
+  paramsTest.xformFilename = "xformfile";
+  paramsTest.showResidual = false;
+  paramsTest.noComments = false;
+  paramsTest.polygonMesh = false;
+  paramsTest.normalWeights = false;
+  paramsTest.nonManifold = false;
+  paramsTest.ascii = false;
+  paramsTest.density = false;
+  paramsTest.linearFit = false;
+  paramsTest.primalVoxel = false;
+  paramsTest.useDouble = false;
+  paramsTest.verbose = true;
+  paramsTest.degree = 1;
+  paramsTest.depth = 9;
+  paramsTest.cgDepth = 0;
+  paramsTest.kernelDepth = 0;
+  paramsTest.adaptiveExponent = 1;
+  paramsTest.iters = 8;
+  paramsTest.voxelDepth = -1;
+  paramsTest.fullDepth = 5;
+  paramsTest.maxSolveDepth = 16;
+  paramsTest.threads = 0;
+  paramsTest.samplesPerNode = 1.5f;
+  paramsTest.scale = 1.1f;
+  paramsTest.confidence = 0.0f;
+  paramsTest.cgSolverAccuracy = 1.0e-3f;
+  paramsTest.pointWeight = 4.0f;
+  paramsTest.color = 16.f;
+  paramsTest.bType = 1; // I think options are 0, 1, 2 but not sure
+*/
+        // this is tedious, but we have to convert params to strings and add them to the arguments vector
+        // then convert the arguments to a synthetic argv char**
+        
+        if(m_inputparams.tempDir != "") {
+            arguments.push_back("--tempDir");
+            arguments.push_back(m_inputparams.tempDir);
+        }
+  
+
+        if(m_inputparams.useDouble) 
+            arguments.push_back("--double");
+        arguments.push_back("--bType");
+        arguments.push_back("1");
+        arguments.push_back("--iters");
+        arguments.push_back("10");
+
+        if(m_inputparams.verbose)
+            arguments.push_back("--verbose");
+
+
+        std::string depthstr = std::to_string(m_inputparams.depth);
+	      char const *depth_char = depthstr.c_str();
+        arguments.push_back("--depth");
+        arguments.push_back(const_cast<char*>(depth_char));
+
+        // now convert to vector of char*
+        for (const auto& arg : arguments)
+            m_argVec.push_back((char*)arg.data());
+        m_argVec.push_back(nullptr);
+
+        m_argc = m_argVec.size() - 1;
+
+        // assign address of start of data to m_argv (final synthetic version of argv)
+        m_argv = m_argVec.data();
+
+        std::cout << "number of arguments: " << m_argc << std::endl;
+        std::cout << "printing m_argv inside constructor: " << std::endl;
+        for (int i = 0; i < m_argc; i++)
+            std::cout << m_argv[i] << std::endl;
+        std::cout << "press enter to continue" << std::endl;
+        std::cin.get();
+
     }                                                
 
     /// Top-level routine to run mesh reconstruction and write out PLY file.
     void Run();
   
   private:
-     PoissonParams m_paramsTest;
+     PoissonParams m_inputparams;
      std::string m_input_file;
      std::string m_output_ply_file;
-     int m_depth;
+     //int m_depth;
      int m_argc;
      char** m_argv;
+     std::vector<char*> m_argVec;
+     bool m_useSyntheticParams;
 };
 
 //  Old version for reference (works but doesn't let you specify all the parameters)

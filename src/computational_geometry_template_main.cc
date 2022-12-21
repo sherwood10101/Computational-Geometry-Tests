@@ -159,7 +159,12 @@ int main (const int argc, char **const argv)
   std::cin.get();
 
   //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest);
-  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest, points_file, output_ply_file, depth, argctest, argv2);
+
+  // old version that worked:
+  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest, points_file, output_ply_file, depth, argctest, argv2);
+
+  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file, argctest, argv2);
+
 
   mesh_reconstructor.Run();
   if (fs::exists(points_file)) {
