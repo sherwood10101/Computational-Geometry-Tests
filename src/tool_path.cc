@@ -292,8 +292,6 @@ void ToolPath::InsertPathPointAtCurrentPosition(const Vector3D& location,
 
 void ToolPath::append(ToolPath& other_path) {
   // 1. Make sure paths have consistent data.
-  updatePointIndices();
-  other_path.updatePointIndices();
   int n_points_orig =  numPoints();
   int n_locations_orig =  m_locations.size();
   int n_data_orig =  m_data.size();
@@ -343,7 +341,6 @@ void ToolPath::append(ToolPath& other_path) {
 
   // 7. Update point indices.
   m_point_indices_valid = false;
-  updatePointIndices();
 
   // 8. Clear other_path for memory efficiency.
   other_path.clear();
@@ -354,8 +351,6 @@ void ToolPath::insert(int point_index, ToolPath& other_path) {
   assert(point_index < numPoints());
   
   // 1. Make sure paths have consistent data.
-  updatePointIndices();
-  other_path.updatePointIndices();
   int n_points_orig =  numPoints();
   int n_locations_orig =  m_locations.size();
   int n_data_orig =  m_data.size();
@@ -407,7 +402,6 @@ void ToolPath::insert(int point_index, ToolPath& other_path) {
 
   // 7. Update point indices.
   m_point_indices_valid = false;
-  updatePointIndices();
 
   // 8. Clear other_path for memory efficiency.
   other_path.clear();

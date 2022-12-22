@@ -5,4 +5,4 @@ FROM mcr.microsoft.com/devcontainers/cpp:0-${VARIANT}
 
 # [Optional] Uncomment this section to install additional packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-     && apt-get -y install --no-install-recommends cmake g++ libpng-dev libx11-dev libgl-dev libegl-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libdrm-dev libjpeg-dev
+     && apt-get -y install --no-install-recommends gdb cmake g++ libpng-dev libx11-dev libgl-dev libegl-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libdrm-dev libjpeg-dev

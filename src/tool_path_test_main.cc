@@ -380,14 +380,12 @@ int main (const int argc, char **const argv)
                nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
   for (int i = 0; i < n_sub_paths - 1; i++) {
     int percentage = (100 * i) / n_sub_paths;
-    if (i % (n_sub_paths / 10) == 0) {
-      std::cout << percentage << "% done" << std::endl;
-    }
     computational_geometry::ToolPath sub_path(n_points_sub_path);
     fillToolPath(sub_path, step_coord_change_avg, vector_data_size, 
                  nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
     tool_path_combined.append(sub_path);
   }
+  tool_path_combined.updatePointIndices();
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
   std::cout << "Concatenation done, combined ToolPath size = " << tool_path_combined.numPoints() 
