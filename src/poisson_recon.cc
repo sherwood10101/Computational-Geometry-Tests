@@ -775,29 +775,70 @@ void PoissonMeshReconstructor::Run()
 {
 	std::cout << "Running PoissonRecon..." << std::endl;
 	
+	// assign this here becuase it doesn't work if you do it in the constructor
+	if(m_useSyntheticParams) {
+		m_argv = m_argVec.data();
+		std::cout<< "in Run() using synthetic params" << std::endl;
+	}
 
+	std::cout << "number of arguments: " << m_argc << std::endl;
+	std::cout << "printing  @@@ m_argv @@@ in run(): " << std::endl;
+	for (int i = 0; i < m_argc; i++)
+		std::cout << m_argv[i] << std::endl;
+	std::cout << "press enter to continue" << std::endl << std::endl;
+	std::cin.get();
 
-
-	int argc = m_argc;
-	char** argv = m_argv;
+	// this didn't work
+	//int argc = m_argc;
+	//char** argv = m_argv;
 
 ////////// debugging ////////////////
-
-        std::cout << "number of arguments: " << m_argc << std::endl;
-        std::cout << "printing  ### argv ### in run(): " << std::endl;
-        for (int i = 0; i < argc; i++)
-            std::cout << argv[i] << std::endl;
-        std::cout << "press enter to continue" << std::endl;
-        std::cin.get();
-
+/*
+	std::cout << "number of arguments: " << argc << std::endl;
+	std::cout << "printing  ### argv ### in run(): " << std::endl;
+	for (int i = 0; i < argc; i++)
+		std::cout << argv[i] << std::endl;
+	std::cout << "press enter to continue" << std::endl;
+	std::cin.get();
+*/
 /////////// end debugging ///////////
 
 
 
 
 	double t = Time();
-	cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+    
+	cmdLineParse( m_argc-1 , &m_argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
 
+	//if(m_useSyntheticParams)
+	//	cmdLineParse( m_argc-1 , &m_argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+	//else {
+	//	cmdLineParse( m_argc-1 , &m_argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+		//cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+	//}
+	
+	// old version
+	//cmdLineParse( argc-1 , &argv[1] , sizeof(params)/sizeof(cmdLineReadable*) , params , 1 );
+	
+	{
+		if( Density.set )
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorAndValueVertex< float > >( m_argc , m_argv );
+				else             Execute< float  , PlyColorAndValueVertex< float > >( m_argc , m_argv );
+			else
+				if( Double.set ) Execute< double , PlyValueVertex< float > >( m_argc , m_argv );
+				else             Execute< float  , PlyValueVertex< float > >( m_argc , m_argv );
+		else
+			if( Color.set && Color.value>0 )
+				if( Double.set ) Execute< double , PlyColorVertex< float > >( m_argc , m_argv );
+				else             Execute< float  , PlyColorVertex< float > >( m_argc , m_argv );
+			else
+				if( Double.set ) Execute< double , PlyVertex< float > >( m_argc , m_argv );
+				else             Execute< float  , PlyVertex< float > >( m_argc , m_argv );
+	}
+
+
+    /*
 	{
 		if( Density.set )
 			if( Color.set && Color.value>0 )
@@ -814,6 +855,7 @@ void PoissonMeshReconstructor::Run()
 				if( Double.set ) Execute< double , PlyVertex< float > >( argc , argv );
 				else             Execute< float  , PlyVertex< float > >( argc , argv );
 	}
+	*/
 }
 
 

@@ -45,11 +45,10 @@ void writePointsFile(const std::string& points_file, computational_geometry::Mes
 
 int main (const int argc, char **const argv) 
 {
-  std::cout << "MODS 2.  Press enter to continue..." << std::endl;
-  std::cin.get();
 
-  if (argc != 3) {
-    std::cout << "Incorrect usage, must be: computational_geometry_template <input_mesh_file> <poisson_reconstructed_ply_file>" << std::endl;
+
+  if (argc != 4) {
+    std::cout << "Incorrect usage, must be: computational_geometry_template <input_mesh_file> <poisson_reconstructed_ply_file> <depth(1-16)>" << std::endl;
     return -1;
   }
 
@@ -72,16 +71,17 @@ int main (const int argc, char **const argv)
 
   std::string points_file("points.txt");
   writePointsFile(points_file, mesh_loader.getMesh());
-  int depth = 5;
+  int depth = atoi(argv[3]);
 
+  // set specific values from commandline after setting default values
+  // here are the default values:
   computational_geometry::PoissonParams paramsTest;
-  paramsTest.programName = "computational_geometry_template_main.cc";
-  paramsTest.inputFilename = points_file;
-  paramsTest.outputFilename = argv[2];
+  paramsTest.programName = "";
+  paramsTest.inputFilename = "";
+  paramsTest.outputFilename = "";
   paramsTest.tempDir = "";
-  //paramsTest.tempDir = "tempdir";
-  paramsTest.voxelGridFilename = "voxelfile";
-  paramsTest.xformFilename = "xformfile";
+  paramsTest.voxelGridFilename = "";
+  paramsTest.xformFilename = "";
   paramsTest.showResidual = false;
   paramsTest.noComments = false;
   paramsTest.polygonMesh = false;
@@ -93,77 +93,37 @@ int main (const int argc, char **const argv)
   paramsTest.primalVoxel = false;
   paramsTest.useDouble = false;
   paramsTest.verbose = true;
-  paramsTest.degree = 1;
-  paramsTest.depth = 9;
-  paramsTest.cgDepth = 0;
-  paramsTest.kernelDepth = 0;
-  paramsTest.adaptiveExponent = 1;
-  paramsTest.iters = 8;
-  paramsTest.voxelDepth = -1;
-  paramsTest.fullDepth = 5;
-  paramsTest.maxSolveDepth = 16;
-  paramsTest.threads = 0;
-  paramsTest.samplesPerNode = 1.5f;
-  paramsTest.scale = 1.1f;
-  paramsTest.confidence = 0.0f;
-  paramsTest.cgSolverAccuracy = 1.0e-3f;
-  paramsTest.pointWeight = 4.0f;
-  paramsTest.color = 16.f;
-  paramsTest.bType = 1; // I think options are 0, 1, 2 but not sure
+  paramsTest.degree = -1;           // typical value is 1; to use default
+  paramsTest.depth = 10;            // typical value is 9; -1 to use default
+  paramsTest.cgDepth = -1;          // typ val is 0? ; -1 to use default
+  paramsTest.kernelDepth = -1;      // typ val is 0? ; -1 to use default
+  paramsTest.adaptiveExponent = -1; // typical value is 1; -1 to use default
+  paramsTest.iters = -1;            // typical value is 8; -1 to use default
+  paramsTest.fullDepth = -1;        // typical value is 5; -1 to use default
+  paramsTest.maxSolveDepth = -1;    // typical value is 16; -1 to use default
+  paramsTest.threads = -1;          // typical value is 0; -1 to use default
+  paramsTest.samplesPerNode = -1.0f;// typical value is 1.5f; -1.0 to use default
+  paramsTest.scale = -1.0f;         // typical value is 1.1f; -1.0 to use default
+  paramsTest.confidence = -1.0f;    // typical value is 0.0f; -1.0 to use default
+  paramsTest.cgSolverAccuracy = -1.0f;  // typical value is 1.0e-3f; -1.0 to use default
+  paramsTest.pointWeight = -1.0f;    // typical value is 4.0f; -1.0 to use default
+  paramsTest.color = -1.0f; // -1. to disable. typical is 16.f if there is color in the file to be read
+  paramsTest.bType = -1; // I think options are 0, 1, 2 but not sure;  -1 to use default
 
-  
-  // test creating synthetic argc and argv
-  std::string tmp = std::to_string(paramsTest.depth);
-	char const *depth_char = tmp.c_str();
+  // set specific values from commandline arguments:
+  paramsTest.programName = "computational_geometry_template_main.cc";
+  paramsTest.inputFilename = points_file;
+  paramsTest.outputFilename = argv[2];
+  paramsTest.depth = depth;
 
+   // this works for running with params from program
+  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest);
 
-  std::vector<std::string> arguments = { "PoissonRecon", "--in", const_cast<char*>(paramsTest.inputFilename.c_str()),
-	                 "--out", const_cast<char*>( paramsTest.outputFilename.c_str()),
-	                 "--depth", const_cast<char*>(depth_char)};
+  // version to pass selected arguments (This still needs work):
+  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file, depth, argc, argv);
 
-  if(paramsTest.tempDir != "") {
-    arguments.push_back("--tempDir");
-    arguments.push_back(paramsTest.tempDir);
-  }
-
-  if(paramsTest.useDouble) 
-      arguments.push_back("--double");
-  arguments.push_back("--bType");
-  arguments.push_back("1");
-  arguments.push_back("--iters");
-  arguments.push_back("10");
-  //arguments.push_back(paramsTest.bType);
-  if(paramsTest.verbose)
-      arguments.push_back("--verbose");
-
-
-  int argctest = 0;
-  std::vector<char*> argvtest;
-
-
-  // function call doesn't preserve the data in argvtest;  it is empty
-  //computational_geometry::testargs(argctest, argvtest, arguments);
-
-  for (const auto& arg : arguments)
-      argvtest.push_back((char*)arg.data());
-  argvtest.push_back(nullptr);
-  argctest = argvtest.size() - 1;
-
-  char** argv2 = argvtest.data();
-
-  std::cout << "number of arguments: " << argctest << std::endl;
-    std::cout << "printing synthetic argv2: " << std::endl;
-  for (int i = 0; i < argctest; i++)
-    std::cout << argv2[i] << std::endl;
-  std::cout << "press enter to continue" << std::endl;
-  std::cin.get();
-
-  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest);
-
-  // old version that worked:
-  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest, points_file, output_ply_file, depth, argctest, argv2);
-
-  computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file, argctest, argv2);
+  // use this one to pass just argc and argv
+  //computational_geometry::PoissonMeshReconstructor mesh_reconstructor( argc, argv);
 
 
   mesh_reconstructor.Run();
