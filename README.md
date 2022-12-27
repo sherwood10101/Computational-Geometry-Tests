@@ -32,6 +32,9 @@ Project to demo/test ToolPath library.  It does following:
 - tracks performance for random access of 10% of the data
 - tracks performance for downgrading points to the minimum (i.e., replace all upgraded nodes with simplest version with no metadata)
 - tracks performance to randomly insert 10% new nodes with random metadata as above
+- tracks performance of creation of 2 paths of the 1/3 size and add one path to the end of another.
+- tracks performance of insertion of copy of one of the above paths into the middle of combined path.
+- tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path.
 
 # Build and Run
 

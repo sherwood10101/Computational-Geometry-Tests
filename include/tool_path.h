@@ -74,6 +74,7 @@ struct ToolPathPointInfo {
 /// Top-level class for ToolPath object.
 class ToolPath {
   public:
+    ToolPath(const ToolPath& other_tool_path);
     ToolPath(int n_points);
 
     /// @returns number of path points.
@@ -114,6 +115,17 @@ class ToolPath {
     /// @brief utility to increment m_current_position to the next position in m_path.
     /// @returns false if current position is at the end of the list already.
     bool getNext();
+
+    /// @brief utility to append other_path to the end of the given one.
+    /// @note: This procedure invalidates content of the other_path.
+    void append(ToolPath& other_path);
+
+    /// @brief utility to clear all the data in ToolPath.
+    void clear();
+
+    /// @brief insertion of other tool path at given index.
+    /// @note: This procedure invalidates content of the other_path.
+    void insert(int point_index, ToolPath& other_path);
   
   private:
     /// @brief Actual path - sequence of points.
