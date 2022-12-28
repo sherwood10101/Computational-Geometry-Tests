@@ -433,7 +433,7 @@ int main (const int argc, char **const argv)
   computational_geometry::ToolPath tool_path_combined2(tool_paths2);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Simultaneous massive concatenation done, combined ToolPath size = " << tool_path_combined2.numPoints() 
+  std::cout << "Multiple concatenation done, combined ToolPath size = " << tool_path_combined2.numPoints() 
             << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
   
