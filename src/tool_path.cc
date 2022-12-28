@@ -26,6 +26,14 @@ void ToolPathPoint::setDataIndex(int data_index) {
   m_data->setDataIndex(data_index);
 }
 
+ToolPath::ToolPath(int n_points) : m_path(n_points), m_point_indices_map(n_points, nullptr) {
+  int point_counter = 0;
+  for (auto& path_point : m_path){
+    m_point_indices_map[point_counter] = &path_point;
+    point_counter++;
+  }
+}
+
 ToolPath::ToolPath(const ToolPath& other_tool_path) : m_path(other_tool_path.m_path),
                                                       m_current_position_set(false),
                                                       m_point_indices_valid(false),
@@ -35,12 +43,97 @@ ToolPath::ToolPath(const ToolPath& other_tool_path) : m_path(other_tool_path.m_p
   updatePointIndices();
 }
 
-ToolPath::ToolPath(int n_points) : m_path(n_points), m_point_indices_map(n_points, nullptr) {
-  int point_counter = 0;
-  for (auto& path_point : m_path){
-    m_point_indices_map[point_counter] = &path_point;
-    point_counter++;
+ToolPath::ToolPath(std::vector<ToolPath>& other_tool_paths) : m_current_position_set(false),
+                                                              m_point_indices_valid(false) {
+  // First pass - update indices in original tool paths and calculate total sizes of containers.
+  int n_paths = other_tool_paths.size();
+  if (n_paths == 0) {
+    return;
   }
+
+  ToolPath& first_tool_path = other_tool_paths[0];
+  assert(first_tool_path.m_point_indices_valid);
+  int n_locations_total = first_tool_path.m_locations.size();
+  int n_data_total = first_tool_path.m_data.size();
+  for (int i = 1; i < n_paths; i++) {
+    ToolPath& tool_path_cur = other_tool_paths[i];
+    assert(tool_path_cur.m_point_indices_valid);
+    int n_locations_cur = tool_path_cur.m_locations.size();
+    int n_comments_cur = tool_path_cur.m_comments.size();
+    int n_data_cur = tool_path_cur.m_data.size();
+
+    for (auto& point_cur : tool_path_cur.m_path) {
+      if (point_cur.m_location_index >= 0) {
+        // Apply offset to location index.
+        point_cur.m_location_index += n_locations_total;
+      }
+
+      if (point_cur.m_data) {
+        int data_index = point_cur.m_data->getDataIndex();
+        if (data_index >= 0) {
+          // Apply offset to daya index.
+          point_cur.m_data->setDataIndex(data_index + n_data_total);
+        }
+      }
+    }
+
+    n_locations_total += n_locations_cur;
+    n_data_total += n_data_cur;
+  }
+
+  // Second pass - concatenate all the containers.
+  m_locations = std::vector<Vector3D>(n_locations_total);
+  m_data = std::vector<Data3D>(n_data_total);
+  int location_counter = 0;
+  int data_counter = 0;
+  for (int i = 0; i < n_paths; i++) {
+    ToolPath& tool_path_cur = other_tool_paths[i];
+
+    // Annotate locations.
+    for (const auto& location_cur : tool_path_cur.m_locations) {
+      m_locations[location_counter] = location_cur;
+      location_counter++;
+    }
+    tool_path_cur.m_locations.clear();
+
+    // Annotate data.
+    for (const auto& data_cur : tool_path_cur.m_data) {
+      m_data[data_counter] = data_cur;
+      data_counter++;
+    }
+    tool_path_cur.m_data.clear();
+
+    // Add comments.
+    for (const auto other_comment : tool_path_cur.m_comments) {
+      m_comments.insert(other_comment);
+    }
+    for (auto& path_point : tool_path_cur.m_path) {
+      if (path_point.m_data) {
+        int comment_index_orig = path_point.m_data->getCommentIndex();
+        if (comment_index_orig >= 0) {
+          const std::string comment_str = *std::next(tool_path_cur.m_comments.begin(), comment_index_orig);
+          auto iter = m_comments.find(comment_str);
+          assert(iter != m_comments.end());
+          int comment_index_new = std::distance(m_comments.begin(), iter);
+          path_point.m_data->setCommentIndex(comment_index_new);
+        }
+      }
+    }
+    tool_path_cur.m_comments.clear();
+
+    // Actual path concatenation.
+    if (i == 0) {
+      m_path = tool_path_cur.m_path;
+    } else {
+      m_path.insert(m_path.end(), tool_path_cur.m_path.begin(), tool_path_cur.m_path.end());
+    }
+
+    // Clear current tool path to minimize memory.
+    tool_path_cur.clear();
+  }
+
+  updatePointIndices();
+  other_tool_paths.clear();
 }
 
 void ToolPath::updatePointIndices() {

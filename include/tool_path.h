@@ -74,8 +74,12 @@ struct ToolPathPointInfo {
 /// Top-level class for ToolPath object.
 class ToolPath {
   public:
-    ToolPath(const ToolPath& other_tool_path);
     ToolPath(int n_points);
+    ToolPath(const ToolPath& other_tool_path);
+    /// @brief Constructor to combine vector of paths in a single path assuming the order in vector.
+    /// @param other_tool_paths tool paths to combine
+    /// @note Input vector of paths is being cleaned up.
+    ToolPath(std::vector<ToolPath>& other_tool_paths);
 
     /// @returns number of path points.
     int numPoints() const {return m_path.size();}
