@@ -34,7 +34,8 @@ Project to demo/test ToolPath library.  It does following:
 - tracks performance to randomly insert 10% new nodes with random metadata as above
 - tracks performance of creation of 2 paths of the 1/3 size and add one path to the end of another.
 - tracks performance of insertion of copy of one of the above paths into the middle of combined path.
-- tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path.
+- tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path sequentially, one after another.
+- tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path all together assuming the order in the input vector of paths is the same as order of creation.
 
 # Build and Run
 

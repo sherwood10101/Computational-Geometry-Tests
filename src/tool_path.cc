@@ -26,6 +26,14 @@ void ToolPathPoint::setDataIndex(int data_index) {
   m_data->setDataIndex(data_index);
 }
 
+ToolPath::ToolPath(int n_points) : m_path(n_points), m_point_indices_map(n_points, nullptr) {
+  int point_counter = 0;
+  for (auto& path_point : m_path){
+    m_point_indices_map[point_counter] = &path_point;
+    point_counter++;
+  }
+}
+
 ToolPath::ToolPath(const ToolPath& other_tool_path) : m_path(other_tool_path.m_path),
                                                       m_current_position_set(false),
                                                       m_point_indices_valid(false),
@@ -35,12 +43,8 @@ ToolPath::ToolPath(const ToolPath& other_tool_path) : m_path(other_tool_path.m_p
   updatePointIndices();
 }
 
-ToolPath::ToolPath(int n_points) : m_path(n_points), m_point_indices_map(n_points, nullptr) {
-  int point_counter = 0;
-  for (auto& path_point : m_path){
-    m_point_indices_map[point_counter] = &path_point;
-    point_counter++;
-  }
+ToolPath::ToolPath(const std::vector<ToolPath>& other_tool_paths) {
+  // TODO : implement this function.
 }
 
 void ToolPath::updatePointIndices() {
