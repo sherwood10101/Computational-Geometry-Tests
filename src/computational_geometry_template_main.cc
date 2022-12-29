@@ -71,6 +71,7 @@ int main (const int argc, char **const argv)
 
   std::string points_file("points.txt");
   writePointsFile(points_file, mesh_loader.getMesh());
+
   int depth = atoi(argv[3]);
 
   // set specific values from commandline after setting default values
@@ -112,8 +113,15 @@ int main (const int argc, char **const argv)
 
   // set specific values from commandline arguments:
   paramsTest.programName = "computational_geometry_template_main.cc";
-  paramsTest.inputFilename = points_file;
-  paramsTest.outputFilename = argv[2];
+  
+  // temp test
+  //paramsTest.inputFilename = points_file;
+  paramsTest.inputFilename = "bunny.points_test_ascii.ply";
+
+
+  // temp test
+  //paramsTest.outputFilename = argv[2];
+  paramsTest.outputFilename = "bunny.points_test_ascii_reconstructed.ply";
   paramsTest.depth = depth;
 
    // this works for running with params from program
