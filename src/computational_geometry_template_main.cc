@@ -23,6 +23,10 @@ void writePointsFile(const std::string& points_file, computational_geometry::Mes
 
   std::cout << "Writing out points file: " << points_file << "..." << std::endl;
   computational_geometry::CGMesh& cg_mesh = mesh.getMesh();
+  cg_mesh.update_face_normals();
+  cg_mesh.update_vertex_normals(); // important because many input mesh files do not include vertex normals
+
+
   for (auto v_it = cg_mesh.vertices_begin(); v_it != cg_mesh.vertices_end(); ++v_it) {
     computational_geometry::CGMesh::Point point = cg_mesh.point(*v_it);
     computational_geometry::CGMesh::Normal normal = cg_mesh.normal(*v_it);
@@ -114,23 +118,24 @@ int main (const int argc, char **const argv)
   // set specific values from commandline arguments:
   paramsTest.programName = "computational_geometry_template_main.cc";
   
-  // temp test
-  //paramsTest.inputFilename = points_file;
-  paramsTest.inputFilename = "bunny.points_test_ascii.ply";
+  
+  paramsTest.inputFilename = points_file;
+  // temp test - hard code bunny file to test reconstruction with points + normals in input file
+  //paramsTest.inputFilename = "bunny.points_test_ascii.ply";
+
+  
+  paramsTest.outputFilename = argv[2];
 
 
-  // temp test
-  //paramsTest.outputFilename = argv[2];
-  paramsTest.outputFilename = "bunny.points_test_ascii_reconstructed.ply";
   paramsTest.depth = depth;
 
-   // this works for running with params from program
+   // this works for running with params from program or use a mix of commandline and program-specified
   computational_geometry::PoissonMeshReconstructor mesh_reconstructor(paramsTest);
 
-  // version to pass selected arguments (This still needs work):
+  // use this constructor to pass selected arguments (This still needs work):
   //computational_geometry::PoissonMeshReconstructor mesh_reconstructor(points_file, output_ply_file, depth, argc, argv);
 
-  // use this one to pass just argc and argv
+  // use this constructor to pass just argc and argv
   //computational_geometry::PoissonMeshReconstructor mesh_reconstructor( argc, argv);
 
 

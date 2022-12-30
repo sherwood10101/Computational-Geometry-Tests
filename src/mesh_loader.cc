@@ -14,8 +14,14 @@ Mesh::Mesh(const std::string& mesh_file)
   if (!OpenMesh::IO::read_mesh(m_mesh, mesh_file, options))  {
     throw std::runtime_error("Cannot load mesh file");
   }
+
+  // you may not need all these items.  remove some to save memory if desired
   m_mesh.request_face_normals();
   m_mesh.request_vertex_normals();
+  m_mesh.request_halfedge_normals();
+  m_mesh.request_face_colors();
+  m_mesh.request_edge_colors();
+  m_mesh.request_vertex_colors();
 }
 
 void Mesh::reportStats() const 

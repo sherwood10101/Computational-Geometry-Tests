@@ -9,6 +9,7 @@ Template project using Visual Studio Code Remote environment using development c
 It does following:
 
  1. Loads STL or PLY file (both ascii and binary formats are allowed)
+ 1a. Update face and vertex normals
  2. Perform some simple calculation (check and list statistics about total number of vertices and faces and total area of faces) and prints it to stdout to terminal.
  3. Using vertices and vertex normals from loaded mesh, writes out temporary point cloud file and calls PoissonRecon algorithm to reconstruct triangular mesh and write it to output PLY file.
  4. Displays the mesh using polyscope.
@@ -52,8 +53,11 @@ If you get "command not found", you can manually create the build directory and 
 
 ### Step 3 - Run computational_geometry_template application
 
+usage: <name of calling program> <input mesh file> <output reconstructed mesh file> <depth>
+
 ```
-./install/bin/computational_geometry_template ./examples/airplane_ascii.ply ./airplane_ascii_poisson_reconstructed.ply
+./install/bin/computational_geometry_template ./examples/airplane_ascii.ply 8
+./airplane_ascii_poisson_reconstructed.ply
 ```
  
 

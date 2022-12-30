@@ -6,7 +6,7 @@
 
 namespace computational_geometry {
 
-/*  // usage from poisson_recon.cc //
+/*  // usage from poisson_recon.cc - params should correspond to these //
 possible options are:
   degree
   double
@@ -85,7 +85,7 @@ struct PoissonParams
 
 
 
-
+// use this constructor to send only these specific items
 class PoissonMeshReconstructor {
   public:
     PoissonMeshReconstructor(const std::string& input_points_file, 
@@ -120,18 +120,6 @@ class PoissonMeshReconstructor {
         m_input_file = m_inputparams.inputFilename;
         m_output_ply_file = m_inputparams.outputFilename;
         
-        // turn paramsTest into argv, argc here
-
-
-
-
-        //std::vector<std::string> m_arguments = { "PoissonRecon", "--in", const_cast<char*>(m_inputparams.inputFilename.c_str()),
-	      //           "--out", const_cast<char*>( m_inputparams.outputFilename.c_str())};
-
-        m_arguments = { "PoissonRecon", "--in", const_cast<char*>(m_inputparams.inputFilename.c_str()),
-        "--out", const_cast<char*>( m_inputparams.outputFilename.c_str())};
-
-
 
         /* // Example PoissonParams struct data //
           paramsTest.programName = "computational_geometry_template_main.cc";
@@ -173,6 +161,9 @@ class PoissonMeshReconstructor {
 
         // this is tedious, but we have to convert params to strings and add them to the m_arguments vector
         // then convert the m_arguments to a synthetic argv char**
+
+        m_arguments = { "PoissonRecon", "--in", const_cast<char*>(m_inputparams.inputFilename.c_str()),
+                        "--out", const_cast<char*>( m_inputparams.outputFilename.c_str())};
         
         if(m_inputparams.tempDir != "") {
             m_arguments.push_back("--tempDir");
@@ -349,18 +340,6 @@ class PoissonMeshReconstructor {
 
         m_argc = m_argVec.size() - 1;
 
-        // assign address of start of data to m_argv (final synthetic version of argv)
-        //m_argv = m_argVec.data();
-
-        /*
-        std::cout << "number of m_arguments: " << m_argc << std::endl;
-        std::cout << "printing m_argv inside constructor: " << std::endl;
-        for (int i = 0; i < m_argc; i++)
-            std::cout << m_argv[i] << std::endl;
-        std::cout << "press enter to continue" << std::endl << std::endl;
-        std::cin.get();
-        */
-
     }                                                
 
     /// Top-level routine to run mesh reconstruction and write out PLY file.
@@ -378,27 +357,5 @@ class PoissonMeshReconstructor {
      bool m_useSyntheticParams;
 };
 
-//  Old version for reference (works but doesn't let you specify all the parameters)
-/*
-class PoissonMeshReconstructor {
-  public:
-    PoissonMeshReconstructor(const PoissonParams& paramsTest,
-                             const std::string& input_points_file, 
-                             const std::string& output_ply_file,
-                             const int depth) : m_paramsTest(paramsTest),
-                                                m_input_file(input_points_file),
-                                                m_output_ply_file(output_ply_file),
-                                                m_depth(depth) {}
-
-    /// Top-level routine to run mesh reconstruction and write out PLY file.
-    void Run();
-  
-  private:
-     PoissonParams m_paramsTest;
-     std::string m_input_file;
-     std::string m_output_ply_file;
-     int m_depth;
-};
-*/
   
 } // namespace computational_geometry
