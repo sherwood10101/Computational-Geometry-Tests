@@ -53,11 +53,11 @@ If you get "command not found", you can manually create the build directory and 
 
 ### Step 3 - Run computational_geometry_template application
 
-usage: <name of calling program> <input mesh file> <output reconstructed mesh file> <depth>
+usage: 'name of calling program' 'input mesh file' 'output reconstructed mesh file' 'depth'
 
 ```
-./install/bin/computational_geometry_template ./examples/airplane_ascii.ply 8
-./airplane_ascii_poisson_reconstructed.ply
+./install/bin/computational_geometry_template ./examples/airplane_ascii.ply
+./airplane_ascii_poisson_reconstructed.ply 8
 ```
  
 
