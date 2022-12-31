@@ -58,12 +58,16 @@ If you get "command not found", you can manually create the build directory and 
 
 ### Step 3 - Run computational_geometry_template and/or tool_path_test applications
 
+To run computational_geometry_template:
+
 ```
 ./install/bin/computational_geometry_template ./examples/airplane_ascii.ply ./airplane_ascii_poisson_reconstructed.ply
 ```
 
- ```
-./install/bin/tool_path_test
+To run ToolPath unit tests:
+
+```
+./run_tests_all.sh
 ```
 
 
