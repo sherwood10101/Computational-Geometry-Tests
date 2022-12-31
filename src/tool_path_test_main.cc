@@ -325,6 +325,46 @@ void testAppendAndInsert(int n_points_short, int step_coord_change_avg, double p
   report_memory();
 }
 
+/// @brief Test for performance of concatenation of n_sub_paths ToolPaths (amount should be large, i.e., 1000)
+/// of n_points_sub_path size each (which is about 100000) into one single ToolPath.
+void testSequentialAppend(int n_sub_paths, int n_points_sub_path, int step_coord_change_avg, 
+                          double percentage_of_points_to_insert, double nodes_percentage_with_string_data, 
+                          double nodes_percentage_with_3d_vector, int vector_data_size) {
+  // 1. Create n_sub_paths paths with n_points_sub_path points each and store them in vector.
+  std::cout << "Creation of " << n_sub_paths << " ToolPaths of " << n_points_sub_path 
+            << " size each and add them into the vector of pre-calculated ToolPaths..." << std::endl;
+  auto start = std::chrono::steady_clock::now();
+  std::vector<computational_geometry::ToolPath> tool_paths;
+  tool_paths.reserve(n_sub_paths);
+  for (int i = 0; i < n_sub_paths; i++) {
+    computational_geometry::ToolPath sub_path(n_points_sub_path);
+    fillToolPath(sub_path, step_coord_change_avg, vector_data_size, 
+                 nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+    tool_paths.push_back(sub_path);
+  }
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  std::cout << "Generation of vector of tool paths is done, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
+  
+  // 2. Concatenate pre-generated (on step 9) n_sub_paths paths into combined path sequentially, one after another.
+  std::cout << "Concatenation of created " << n_sub_paths << " ToolPaths "
+            << " into combined ToolPath sequentially..." << std::endl;
+  start = std::chrono::steady_clock::now();
+  computational_geometry::ToolPath tool_path_combined(tool_paths[0]);
+  fillToolPath(tool_path_combined, step_coord_change_avg, vector_data_size, 
+               nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+  for (int i = 1; i < n_sub_paths; i++) {
+    tool_path_combined.append(tool_paths[i]);
+  }
+  tool_path_combined.updatePointIndices();
+  end = std::chrono::steady_clock::now();
+  elapsed_seconds = end - start;
+  std::cout << "Sequential concatenation done, combined ToolPath size = " << tool_path_combined.numPoints() 
+            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  report_memory();
+}
+
 int main (const int argc, char **const argv) 
 {
   if (argc != 1) {
@@ -375,46 +415,14 @@ int main (const int argc, char **const argv)
   testAppendAndInsert(n_points_short, step_coord_change_avg, percentage_of_points_to_insert,
                       nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
 
-  // 7. Create 1000 paths with 100000 points each and store them in vector.
+  // 7. Track performance of creation of 1000 paths with 100000 points each and 
+  // concatenating them into combined path sequentially, one after another.
   int n_sub_paths = 1000;
   int n_points_sub_path = 100000;
-  std::cout << "Creation of " << n_sub_paths << " ToolPaths of " << n_points_sub_path 
-            << " size each and add them into the vector of pre-calculated ToolPaths..." << std::endl;
-  start = std::chrono::steady_clock::now();
-  std::vector<computational_geometry::ToolPath> tool_paths;
-  tool_paths.reserve(n_sub_paths);
-  for (int i = 0; i < n_sub_paths; i++) {
-    computational_geometry::ToolPath sub_path(n_points_sub_path);
-    fillToolPath(sub_path, step_coord_change_avg, vector_data_size, 
-                 nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
-    tool_paths.push_back(sub_path);
-  }
-  end = std::chrono::steady_clock::now();
-  elapsed_seconds = end - start;
-  std::cout << "Generation of vector of tool paths is done, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
-  report_memory();
-  
-  // 8. Concatenate pre-generated (on step 9) 1000 paths into combined path sequentially, one after another.
-  std::cout << "Concatenation of created " << n_sub_paths << " ToolPaths "
-            << " into combined ToolPath sequentially..." << std::endl;
-  start = std::chrono::steady_clock::now();
-  computational_geometry::ToolPath tool_path_combined(tool_paths[0]);
-  fillToolPath(tool_path_combined, step_coord_change_avg, vector_data_size, 
-               nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
-  for (int i = 1; i < n_sub_paths; i++) {
-    tool_path_combined.append(tool_paths[i]);
-  }
-  tool_path_combined.updatePointIndices();
-  end = std::chrono::steady_clock::now();
-  elapsed_seconds = end - start;
-  std::cout << "Sequential concatenation done, combined ToolPath size = " << tool_path_combined.numPoints() 
-            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
-  report_memory();
+  testSequentialAppend(n_sub_paths, n_points_sub_path, step_coord_change_avg, percentage_of_points_to_insert,
+                       nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
 
-  // Clear tool_path_combined, we don't need it anymore.
-  tool_path_combined.clear();
-
-  // 9. Create 1000 paths with 100000 points each and store them in vector.
+  // 8. Create 1000 paths with 100000 points each and store them in vector.
   std::cout << "Creation of " << n_sub_paths << " ToolPaths of " << n_points_sub_path 
             << " size each and add them into the vector of pre-calculated ToolPaths..." << std::endl;
   start = std::chrono::steady_clock::now();
@@ -431,7 +439,7 @@ int main (const int argc, char **const argv)
   std::cout << "Generation of vector of tool paths is done, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 
-  // 10. Combine vector of ToolPaths into one path in one shot, assuming the order of them
+  // 9. Combine vector of ToolPaths into one path in one shot, assuming the order of them
   // is the same as order of creation (i.e., order in the vector of paths).
   std::cout << "Concatenation of created " << n_sub_paths << " ToolPaths "
             << " into combined ToolPath in one shot..." << std::endl;
