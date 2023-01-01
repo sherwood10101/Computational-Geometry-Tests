@@ -316,8 +316,8 @@ void testAppendAndInsert(int n_points_short, int step_coord_change_avg, double p
   tool_path_main.append(tool_path2);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Addition done, combined ToolPath size = " << tool_path_main.numPoints() 
-            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  BOOST_TEST(tool_path_main.numPoints() == 2 * n_points_short);
+  std::cout << "Addition done, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
   
   // 4. Insert tool_path3 into the middle of combined path.
@@ -326,6 +326,7 @@ void testAppendAndInsert(int n_points_short, int step_coord_change_avg, double p
   tool_path_main.insert(n_points_short, tool_path3);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
+  BOOST_TEST(tool_path_main.numPoints() == 3 * n_points_short);
   std::cout << "Insertion done, combined ToolPath size = " << tool_path_main.numPoints() 
             << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
@@ -367,8 +368,8 @@ void testSequentialAppend(int n_sub_paths, int n_points_sub_path, int step_coord
   tool_path_combined.updatePointIndices();
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Sequential concatenation done, combined ToolPath size = " << tool_path_combined.numPoints() 
-            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  BOOST_TEST(tool_path_combined.numPoints() == n_sub_paths * n_points_sub_path);
+  std::cout << "Sequential concatenation done, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 }
 
@@ -403,20 +404,24 @@ void testAppendInOneShot(int n_sub_paths, int n_points_sub_path, int step_coord_
   computational_geometry::ToolPath tool_path_combined(tool_paths);
   end = std::chrono::steady_clock::now();
   elapsed_seconds = end - start;
-  std::cout << "Multiple concatenation done, combined ToolPath size = " << tool_path_combined.numPoints() 
-            << ", elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
+  BOOST_TEST(tool_path_combined.numPoints() == n_sub_paths * n_points_sub_path);
+  std::cout << "Multiple concatenation done, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
   report_memory();
 }
 
-BOOST_AUTO_TEST_SUITE(tool_path_test_suite)
-
-BOOST_AUTO_TEST_CASE(all_tests)
-{
-  int n_points_total = 100000000;
+struct ToolPathTestParams {
   int step_coord_change_avg = 20;
   int vector_data_size = 10;
   double nodes_percentage_with_string_data = 1.;
   double nodes_percentage_with_3d_vector = 0.1;
+};
+
+BOOST_AUTO_TEST_SUITE(tool_path_test_suite)
+
+BOOST_AUTO_TEST_CASE(ConstructionTest)
+{
+  ToolPathTestParams dut;
+  int n_points_total = 100000000;
   const bool debug_output = false;
 
   // 1. Create ToolPath and fill it's data according to spec, measure performance (runtime and memory).
@@ -424,8 +429,8 @@ BOOST_AUTO_TEST_CASE(all_tests)
   std::cout << "Building ToolPath object..." << std::endl;
   auto start = std::chrono::steady_clock::now();
   computational_geometry::ToolPath tool_path(n_points_total);
-  fillToolPath(tool_path, step_coord_change_avg, vector_data_size, 
-               nodes_percentage_with_string_data, nodes_percentage_with_3d_vector);
+  fillToolPath(tool_path, dut.step_coord_change_avg, dut.vector_data_size, 
+               dut.nodes_percentage_with_string_data, dut.nodes_percentage_with_3d_vector);
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "ToolPath object created, elapsed_time = " << elapsed_seconds.count() << " sec" << std::endl;
@@ -445,27 +450,32 @@ BOOST_AUTO_TEST_CASE(all_tests)
   // 5. Track performance to randomly insert 10% new nodes with random metadata as above.
   double percentage_of_points_to_insert = 10.;
   testRandomSinglePointInsertion(tool_path, percentage_of_points_to_insert, 
-                                 nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
+                                 dut.nodes_percentage_with_string_data, dut.nodes_percentage_with_3d_vector, 
+                                 dut.vector_data_size);
+}
 
-  // Clear contents of the existing tool_path - we don't need it anymore.
-  tool_path.clear();
+BOOST_AUTO_TEST_CASE(ConcatenationTest)
+{
+  ToolPathTestParams dut;
+  int n_points_total = 100000000;
+  double percentage_of_points_to_insert = 10.;
 
   // 6. Track performance of insert() and append() operations for paths of 1/3 of original size.
   int n_points_short = n_points_total / 3;
-  testAppendAndInsert(n_points_short, step_coord_change_avg, percentage_of_points_to_insert,
-                      nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
+  testAppendAndInsert(n_points_short, dut.step_coord_change_avg, percentage_of_points_to_insert,
+                      dut.nodes_percentage_with_string_data, dut.nodes_percentage_with_3d_vector, dut.vector_data_size);
 
   // 7. Track performance of creation of 1000 paths with 100000 points each and 
   // concatenating them into combined path sequentially, one after another.
   int n_sub_paths = 1000;
   int n_points_sub_path = 100000;
-  testSequentialAppend(n_sub_paths, n_points_sub_path, step_coord_change_avg, percentage_of_points_to_insert,
-                       nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
+  testSequentialAppend(n_sub_paths, n_points_sub_path, dut.step_coord_change_avg, percentage_of_points_to_insert,
+                       dut.nodes_percentage_with_string_data, dut.nodes_percentage_with_3d_vector, dut.vector_data_size);
 
   // 8. Track performance of creation of 1000 paths with 100000 points each and concatenating them into combined path 
   // all together in one shot, assuming the order in the input vector of paths is the same as order of creation.
-  testAppendInOneShot(n_sub_paths, n_points_sub_path, step_coord_change_avg, percentage_of_points_to_insert,
-                      nodes_percentage_with_string_data, nodes_percentage_with_3d_vector, vector_data_size);
+  testAppendInOneShot(n_sub_paths, n_points_sub_path, dut.step_coord_change_avg, percentage_of_points_to_insert,
+                      dut.nodes_percentage_with_string_data, dut.nodes_percentage_with_3d_vector, dut.vector_data_size);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

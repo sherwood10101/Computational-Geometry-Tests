@@ -67,8 +67,15 @@ To run computational_geometry_template:
 To run ToolPath unit tests:
 
 ```
-./run_tests_all.sh
+./run_tests.sh [test_names_list]
 ```
+
+By default (if test_names_list is not specified), all tests will be executed. List of test names must be comma-separated, for example:
+
+```
+./run_tests.sh tool_path_test_suite/ConstructionTest,ConcatenationTest
+```
+
 
 
 
