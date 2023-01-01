@@ -7,6 +7,9 @@ project(tool_path_test)
 # Default to C++17
 set(CMAKE_CXX_STANDARD 17)
 
+# Dependencies
+find_package(Boost COMPONENTS filesystem system unit_test_framework REQUIRED)
+
 # Gather the source files
 file(GLOB UNIT_TESTS_SRC_FILES ${PROJECT_SOURCE_DIR}/*.cc)
 
