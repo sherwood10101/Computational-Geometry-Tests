@@ -102,10 +102,9 @@ file(
 add_library(ToolPath ${TOOLPATH_SRC_FILES})
 #target_link_libraries(ToolPath PRIVATE OpenMP::OpenMP_CXX)
 
-# ToolPath test executable
-add_executable(tool_path_test src/tool_path_test_main.cc)
-target_link_libraries (tool_path_test ToolPath)
-
+# Unit tests for ToolPath
+add_subdirectory(test)
 
 # Install targets defined above
-install(TARGETS computational_geometry_template tool_path_test DESTINATION bin)
+install(TARGETS computational_geometry_template DESTINATION bin)
+install(TARGETS ToolPath DESTINATION lib)

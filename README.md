@@ -35,7 +35,7 @@ Project to demo/test ToolPath library.  It does following:
 - tracks performance of creation of 2 paths of the 1/3 size and add one path to the end of another.
 - tracks performance of insertion of copy of one of the above paths into the middle of combined path.
 - tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path sequentially, one after another.
-- tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path all together assuming the order in the input vector of paths is the same as order of creation.
+- tracks performance of creation of 1000 paths with 100000 points each and concatenating them into combined path all together in one shot, assuming the order in the input vector of paths is the same as order of creation.
 
 # Build and Run
 
@@ -58,13 +58,24 @@ If you get "command not found", you can manually create the build directory and 
 
 ### Step 3 - Run computational_geometry_template and/or tool_path_test applications
 
+To run computational_geometry_template:
+
 ```
 ./install/bin/computational_geometry_template ./examples/airplane_ascii.ply ./airplane_ascii_poisson_reconstructed.ply
 ```
 
- ```
-./install/bin/tool_path_test
+To run ToolPath unit tests:
+
 ```
+./run_tests.sh [test_names_list]
+```
+
+By default (if test_names_list is not specified), all tests will be executed. List of test names must be comma-separated, for example:
+
+```
+./run_tests.sh tool_path_test_suite/ConstructionTest,ConcatenationTest
+```
+
 
 
 
